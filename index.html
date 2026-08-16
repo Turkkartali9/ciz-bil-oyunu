@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
- 
+
 <!-- Firebase (gerçek zamanlı senkronizasyon için) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
- 
+
 <style>
   :root{
     --paper:#FBF5E8;
@@ -48,10 +48,10 @@
   button{ font-family:'Inter',sans-serif; cursor:pointer; }
   input{ font-family:'Inter',sans-serif; }
   ::selection{ background: var(--brand); color:white; }
- 
+
   .screen{ display:none; min-height:100vh; width:100%; padding:20px; }
   .screen.active{ display:flex; flex-direction:column; align-items:center; }
- 
+
   /* ---------- Ortak bileşenler ---------- */
   .card{
     background:var(--card);
@@ -71,16 +71,16 @@
   .btn-ghost{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--card-border); }
   .btn-ghost:hover{ border-color: var(--ink-soft); color:var(--ink); }
   .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
- 
+
   .field{
     width:100%; padding:14px 16px; border-radius:14px; border:1.5px solid var(--card-border);
     background:#fff; font-size:15px; color:var(--ink); outline:none; transition:border-color .15s;
   }
   .field:focus{ border-color:var(--brand); }
   .field.code-field{ text-transform:uppercase; letter-spacing:6px; text-align:center; font-weight:700; font-size:20px; font-family:'Fredoka',sans-serif; }
- 
+
   .pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; font-size:13px; font-weight:600; }
- 
+
   /* ---------- Logo / doodle ---------- */
   .logo-wrap{ display:flex; flex-direction:column; align-items:center; margin: 28px 0 18px; }
   .logo-wrap svg{ width:220px; height:70px; }
@@ -90,7 +90,7 @@
     stroke-dasharray: 260; stroke-dashoffset:260; animation: draw 0.8s ease forwards 1.4s; }
   @keyframes draw{ to{ stroke-dashoffset:0; } }
   .tagline{ color:var(--ink-soft); font-size:15px; margin-top:2px; text-align:center; }
- 
+
   /* ---------- Landing ---------- */
   #screen-landing{ justify-content:flex-start; padding-top:6vh; }
   .landing-card{ width:100%; max-width:400px; padding:28px; display:flex; flex-direction:column; gap:14px; }
@@ -100,8 +100,8 @@
   .join-row{ display:flex; gap:8px; }
   .join-row .field{ flex:1; }
   .setup-warning{ max-width:440px; margin:8px auto; padding:16px 18px; border-radius:14px; background:#FFF3E0; border:1.5px solid #FFD199; font-size:14px; line-height:1.55; }
-  .setup-warning code{ background:#00000010; padding:1px 6px; border-radius:6px; font-size:12.5px; }
- 
+  .setup-warning code{ background:#EEEEF0; padding:1px 6px; border-radius:6px; font-size:12.5px; }
+
   /* ---------- Lobby ---------- */
   #screen-lobby{ justify-content:flex-start; padding-top:5vh; gap:18px; }
   .room-sticker{
@@ -112,7 +112,7 @@
   .room-sticker span.label{ font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; }
   .room-sticker span.code{ font-family:'Fredoka',sans-serif; font-size:34px; font-weight:700; letter-spacing:8px; color:var(--ink); }
   .room-sticker .hint{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
- 
+
   .lobby-card{ width:100%; max-width:420px; padding:22px; display:flex; flex-direction:column; gap:14px; }
   .player-list{ display:flex; flex-direction:column; gap:8px; }
   .player-chip{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background:#F7F3E8; transition:opacity .2s; }
@@ -123,20 +123,44 @@
   .player-chip .pname{ font-weight:600; flex:1; }
   .crown{ font-size:14px; }
   .lobby-note{ font-size:13px; color:var(--ink-soft); text-align:center; }
- 
+
+  /* ---- Oyun modu seçici ---- */
+  .mode-select{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:#F7F3E8; }
+  .mode-select .mode-title{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .mode-options{ display:flex; gap:8px; }
+  .mode-opt{
+    flex:1; border:1.5px solid var(--card-border); background:#fff; border-radius:12px; padding:12px 10px;
+    font-weight:600; font-size:14px; color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:4px;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .mode-opt .mode-emoji{ font-size:22px; line-height:1; }
+  .mode-opt:hover{ border-color:var(--brand); }
+  .mode-opt.active{ border-color:var(--brand); background:#EAFBF9; box-shadow:0 0 0 1.5px var(--brand) inset; }
+  .mode-opt:disabled{ cursor:default; opacity:1; }
+  .mode-opt.locked{ opacity:.55; }
+  .mode-desc{ font-size:12.5px; color:var(--ink-soft); text-align:center; margin:0; }
+
+  /* ---- Oyun ekranındaki mod rozeti ---- */
+  .mode-badge{
+    display:none; align-self:center; align-items:center; gap:6px; padding:5px 14px; border-radius:999px;
+    font-size:13px; font-weight:700; background:#FFF8DE; border:1.5px solid #E8CE7B; color:var(--ink);
+  }
+  .mode-badge.show{ display:inline-flex; }
+  .mode-badge.blind{ background:#EDE8FF; border-color:#C9BCF7; }
+
   /* ---------- Game ---------- */
   #screen-game{ padding-top:14px; gap:12px; max-width:960px; margin:0 auto; width:100%; }
   .game-top{ width:100%; display:flex; align-items:center; gap:14px; }
-  .timer-wrap{ flex:1; height:14px; border-radius:999px; background:#00000010; overflow:hidden; }
+  .timer-wrap{ flex:1; height:14px; border-radius:999px; background:#EEEEF0; overflow:hidden; }
   .timer-bar{ height:100%; background:var(--brand); border-radius:999px; transition: width 1s linear, background .3s; }
   .round-tag{ font-size:13px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
   .word-tag{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:20px; letter-spacing:4px; white-space:nowrap; }
- 
+
   .score-strip{ display:flex; gap:8px; flex-wrap:wrap; width:100%; }
   .score-chip{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--card-border); font-size:13px; font-weight:600; }
   .score-chip.me{ border-color: var(--brand); }
   .score-chip .dot{ width:9px; height:9px; }
- 
+
   .game-body{ display:flex; gap:14px; width:100%; flex:1; }
   .canvas-card{ flex:2; padding:10px; display:flex; flex-direction:column; gap:10px; min-width:0; position:relative; }
   .canvas-wrap{ position:relative; width:100%; }
@@ -150,7 +174,7 @@
   .size-dot{ border-radius:50%; background:var(--ink); cursor:pointer; opacity:.35; }
   .size-dot.active{ opacity:1; }
   .tools .spacer{ flex:1; }
- 
+
   .side-card{ flex:1; min-width:230px; max-width:300px; padding:14px; display:flex; flex-direction:column; gap:10px; }
   .feed{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; max-height:360px; padding-right:2px; }
   .feed-msg{ font-size:13.5px; padding:8px 10px; border-radius:10px; background:#F7F3E8; line-height:1.4; }
@@ -161,7 +185,7 @@
   .reaction-bar{ display:none; gap:6px; justify-content:center; flex-wrap:wrap; }
   .reaction-btn{ border:1.5px solid var(--card-border); background:#fff; border-radius:10px; padding:6px 10px; font-size:16px; line-height:1; }
   .reaction-btn:hover{ border-color:var(--brand); background:#EAFBF9; }
- 
+
   .word-modal{
     position:fixed; inset:0; background:rgba(35,43,61,0.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
   }
@@ -169,7 +193,7 @@
   .word-modal-card{ background:#fff; border-radius:20px; padding:26px; max-width:380px; width:100%; text-align:center; box-shadow:var(--shadow-lg); }
   .word-choice{ display:block; width:100%; margin-top:10px; padding:14px; border-radius:14px; border:2px solid var(--card-border); background:#FBF5E8; font-family:'Fredoka',sans-serif; font-weight:600; font-size:17px; }
   .word-choice:hover{ border-color:var(--brand); background:#EAFBF9; }
- 
+
   /* ---------- Round/Game end ---------- */
   #screen-roundend, #screen-gameend{ justify-content:flex-start; padding-top:8vh; gap:16px; }
   .end-card{ width:100%; max-width:420px; padding:26px; display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; }
@@ -179,17 +203,17 @@
   .scoreboard .medal{ width:22px; text-align:center; }
   .scoreboard .sname{ flex:1; font-weight:600; }
   .scoreboard .spts{ font-weight:700; color:var(--ink-soft); }
- 
+
   .replay-wrap{ width:100%; }
   .replay-wrap canvas{ width:100%; aspect-ratio:4/3; display:block; background:#fff; border-radius:12px; border:2px solid var(--card-border); }
   .replay-label{ font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:2px 0 6px; }
- 
+
   .top-bar{ position:fixed; top:14px; left:14px; display:flex; gap:8px; z-index:10; }
   .icon-btn{ width:38px; height:38px; border-radius:12px; background:#fff; border:1.5px solid var(--card-border); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:var(--shadow); }
- 
+
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:12px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition: all .25s ease; z-index:80; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
- 
+
   @media (max-width:720px){
     .game-body{ flex-direction:column; }
     .side-card{ max-width:none; }
@@ -198,9 +222,9 @@
 </style>
 </head>
 <body>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <!-- ============ KURULUM UYARISI ============ -->
 <section class="screen" id="screen-setup">
   <div class="logo-wrap">
@@ -218,7 +242,7 @@
     Bunu bir kere yaptıktan sonra siteyi kim açarsa açsın oda kodu ile birlikte oynayabilir.
   </div>
 </section>
- 
+
 <!-- ============ ANA EKRAN ============ -->
 <section class="screen" id="screen-landing">
   <div class="logo-wrap">
@@ -228,24 +252,24 @@
     </svg>
   </div>
   <p class="tagline">3–5 kişilik canlı çiz-bil partisi. Oda aç, kodu paylaş, çizmeye başla.</p>
- 
+
   <div class="card landing-card">
     <div class="name-row">
       <label for="input-name">Adın</label>
       <input id="input-name" class="field" maxlength="14" placeholder="Rumuzun ne olsun?">
     </div>
- 
+
     <button class="btn btn-primary" id="btn-create-room" style="width:100%;">🎨 Yeni Oda Kur</button>
- 
+
     <div class="divider">veya bir odaya katıl</div>
- 
+
     <div class="join-row">
       <input id="input-code" class="field code-field" maxlength="4" placeholder="KOD">
       <button class="btn btn-primary" id="btn-join-room">Katıl</button>
     </div>
   </div>
 </section>
- 
+
 <!-- ============ LOBBY ============ -->
 <section class="screen" id="screen-lobby">
   <div class="room-sticker" id="room-code-sticker" title="Kopyalamak için tıkla">
@@ -253,16 +277,26 @@
     <span class="code" id="lobby-code">----</span>
     <span class="hint">Arkadaşların bu kodu girip katılabilir</span>
   </div>
- 
+
   <div class="card lobby-card">
     <h3 style="margin:0 0 2px;">Oyuncular <span id="lobby-count" style="color:var(--ink-soft); font-weight:500; font-size:14px;"></span></h3>
     <div class="player-list" id="lobby-players"></div>
+
+    <div class="mode-select" id="mode-select">
+      <span class="mode-title">Oyun Modu</span>
+      <div class="mode-options">
+        <button class="mode-opt active" data-mode="normal"><span class="mode-emoji">🎨</span>Normal Mod</button>
+        <button class="mode-opt" data-mode="blind"><span class="mode-emoji">🙈</span>Kör Çizer Modu</button>
+      </div>
+      <p class="mode-desc" id="mode-desc">Çizen kişi kelimeyi görür ve çizer, diğerleri tahmin eder.</p>
+    </div>
+
     <p class="lobby-note" id="lobby-note">En az 3 oyuncu bekleniyor…</p>
     <button class="btn btn-primary" id="btn-start-game" style="width:100%;" disabled>Oyunu Başlat</button>
     <button class="btn btn-ghost" id="btn-leave-lobby" style="width:100%;">Odadan Ayrıl</button>
   </div>
 </section>
- 
+
 <!-- ============ OYUN EKRANI ============ -->
 <section class="screen" id="screen-game">
   <div class="game-top">
@@ -270,9 +304,11 @@
     <div class="timer-wrap"><div class="timer-bar" id="timer-bar" style="width:100%;"></div></div>
     <span class="word-tag" id="word-tag">_ _ _ _</span>
   </div>
- 
+
+  <span class="mode-badge" id="mode-badge"></span>
+
   <div class="score-strip" id="score-strip"></div>
- 
+
   <div class="game-body">
     <div class="card canvas-card">
       <div class="canvas-wrap">
@@ -296,7 +332,7 @@
         <button class="btn btn-ghost" id="btn-clear" style="padding:8px 14px; font-size:13px;">🧹 Temizle</button>
       </div>
     </div>
- 
+
     <div class="card side-card">
       <div class="feed" id="feed"></div>
       <div class="reaction-bar" id="reaction-bar">
@@ -313,7 +349,7 @@
     </div>
   </div>
 </section>
- 
+
 <!-- ============ TUR SONU ============ -->
 <section class="screen" id="screen-roundend">
   <div class="card end-card">
@@ -328,7 +364,7 @@
     <p class="lobby-note" id="roundend-next">Sıradaki çizer için hazırlanıyor…</p>
   </div>
 </section>
- 
+
 <!-- ============ OYUN SONU ============ -->
 <section class="screen" id="screen-gameend">
   <div class="card end-card">
@@ -338,7 +374,7 @@
     <button class="btn btn-ghost" id="btn-back-home" style="width:100%;">Ana Sayfaya Dön</button>
   </div>
 </section>
- 
+
 <!-- ============ KELİME SEÇİM MODALI ============ -->
 <div class="word-modal" id="word-modal">
   <div class="word-modal-card">
@@ -349,12 +385,12 @@
     <button class="word-choice" id="choice-2"></button>
   </div>
 </div>
- 
+
 <div class="top-bar" id="top-bar" style="display:none;">
   <div class="icon-btn" id="btn-copy-code" title="Oda kodunu kopyala">🔗</div>
   <div class="icon-btn" id="btn-sound" title="Sesi aç/kapat">🔊</div>
 </div>
- 
+
 <script>
 /* ======================================================================
    FIREBASE AYARI — kendi ücretsiz Firebase projenin bilgilerini buraya yapıştır.
@@ -370,7 +406,7 @@ const FIREBASE_CONFIG = {
   appId: "1:283583521162:web:4d50431b176aa0a5c6e873"
 };
 /* ====================================================================== */
- 
+
 const WORDS = ["Kedi","Köpek","Uçak","Araba","Güneş","Ay","Yıldız","Deniz","Balık","Kuş",
 "Ağaç","Çiçek","Ev","Kale","Gemi","Roket","Robot","Piyano","Gitar","Pizza",
 "Hamburger","Dondurma","Pasta","Kahve","Şemsiye","Gözlük","Şapka","Ayakkabı","Saat","Telefon",
@@ -380,14 +416,14 @@ const WORDS = ["Kedi","Köpek","Uçak","Araba","Güneş","Ay","Yıldız","Deniz"
 "Fil","Zürafa","Aslan","Penguen","Timsah","Tavşan","Ayı","Kaplumbağa","Yılan","Baykuş",
 "Cüzdan","Çanta","Kalem","Makas","Defter","Kitap","Ampul","Sandalye","Masa","Dolap",
 "Cetvel","Fırça","Ayna","Terazi","Anahtarlık","Bavul","Harita","Pusula","Fener","Kutu"];
- 
+
 const PLAYER_COLORS = ["#FF6B6B","#2EC4B6","#FFC145","#9B87F5","#4C9AFF"];
 const ROUNDS_PER_PLAYER = 2;
 const DRAW_SECONDS = 75;
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 5;
 const WORD_PICK_SECONDS = 12; // kelime seçilmezse otomatik seçim süresi
- 
+
 let db, roomRef, strokesRef, guessesRef, reactionsRef;
 let myId = localStorage.getItem('cb_myId') || ('p_' + Math.random().toString(36).slice(2,10));
 localStorage.setItem('cb_myId', myId);
@@ -406,7 +442,7 @@ let localStrokes = [];   // { key, strokeKey, p1, p2, color, size } — tuvali y
 let strokeHistory = [];  // { strokeKey, keys:[] } — "geri al" için kendi çizgilerimiz
 let guessCache = [];
 let soundOn = localStorage.getItem('cb_sound') !== 'off';
- 
+
 /* ---------- ekran yönetimi ---------- */
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -425,7 +461,7 @@ function toast(msg){
   clearTimeout(t.__hideTimer);
   t.__hideTimer = setTimeout(()=>t.classList.remove('show'), 2200);
 }
- 
+
 /* ---------- ses efektleri (harici dosya yok, WebAudio ile üretiliyor) ---------- */
 let audioCtx = null;
 function ensureAudio(){
@@ -458,7 +494,7 @@ function playSound(kind){
   else if(kind === 'clear'){ mk(300,'sine',0,0.1,0.1); }
   else if(kind === 'start'){ mk(520,'sine',0,0.12,0.14); mk(760,'sine',0.1,0.16,0.14); }
 }
- 
+
 /* ---------- başlangıç ---------- */
 window.addEventListener('DOMContentLoaded', () => {
   if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.databaseURL){
@@ -468,18 +504,18 @@ window.addEventListener('DOMContentLoaded', () => {
   firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
   showScreen('screen-landing');
- 
+
   document.getElementById('btn-sound').textContent = soundOn ? '🔊' : '🔇';
- 
+
   const savedName = localStorage.getItem('cb_myName');
   if(savedName) document.getElementById('input-name').value = savedName;
- 
+
   document.getElementById('btn-create-room').onclick = createRoom;
   document.getElementById('btn-join-room').onclick = joinRoom;
   document.getElementById('input-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
   document.getElementById('input-code').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
   document.getElementById('input-name').addEventListener('keydown', e => { if(e.key==='Enter') createRoom(); });
- 
+
   document.getElementById('room-code-sticker').onclick = copyCode;
   document.getElementById('btn-copy-code').onclick = copyCode;
   document.getElementById('btn-start-game').onclick = startGame;
@@ -487,21 +523,26 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-play-again').onclick = playAgain;
   document.getElementById('btn-back-home').onclick = () => { leaveRoom(); };
   document.getElementById('btn-replay-again').onclick = () => playReplay(roomState ? (roomState.turnIndex||0) : 0);
- 
+
   document.getElementById('btn-clear').onclick = clearCanvas;
   document.getElementById('btn-undo').onclick = undoLastStroke;
   document.getElementById('btn-guess').onclick = sendGuess;
   document.getElementById('input-guess').addEventListener('keydown', e => { if(e.key==='Enter') sendGuess(); });
- 
+
   document.getElementById('btn-sound').onclick = () => {
     soundOn = !soundOn;
     localStorage.setItem('cb_sound', soundOn ? 'on' : 'off');
     document.getElementById('btn-sound').textContent = soundOn ? '🔊' : '🔇';
     if(soundOn) playSound('tick');
   };
- 
+
   document.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => sendReaction(btn.dataset.emoji));
- 
+
+  document.querySelectorAll('.mode-opt').forEach(opt => opt.onclick = () => {
+    if(!isHost || !roomRef) return;               // sadece oda sahibi modu değiştirebilir
+    setGameMode(opt.dataset.mode);
+  });
+
   document.querySelectorAll('.swatch').forEach(sw => sw.onclick = () => {
     document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
     sw.classList.add('active');
@@ -512,14 +553,14 @@ window.addEventListener('DOMContentLoaded', () => {
     sd.classList.add('active');
     currentSize = parseInt(sd.dataset.size);
   });
- 
+
   setupCanvas();
- 
+
   // Sayfa yenilendiğinde aynı odaya otomatik geri dön (bağlantı koptuğunda oyundan atılmayı önler)
   const savedRoom = localStorage.getItem('cb_roomCode');
   if(savedRoom) attemptRejoin(savedRoom);
 });
- 
+
 function getName(){
   const n = document.getElementById('input-name').value.trim() || 'Oyuncu';
   localStorage.setItem('cb_myName', n);
@@ -534,7 +575,7 @@ function randomCode(){
 function copyCode(){
   navigator.clipboard?.writeText(roomCode).then(()=>toast('Oda kodu kopyalandı: ' + roomCode)).catch(()=>toast('Kod: ' + roomCode));
 }
- 
+
 /* ---------- oda oluştur / katıl / yeniden bağlan ---------- */
 function createRoom(){
   myName = getName();
@@ -546,11 +587,12 @@ function createRoom(){
   ref.set({
     status: 'lobby',
     hostId: myId,
+    gameMode: 'normal',
     players: playerObj,
     createdAt: Date.now()
   }).then(() => enterRoom(roomCode)).catch(err => toast('Hata: ' + err.message));
 }
- 
+
 function joinRoom(){
   myName = getName();
   const code = document.getElementById('input-code').value.trim().toUpperCase();
@@ -571,7 +613,7 @@ function joinRoom(){
     }
   }).catch(err => toast('Hata: ' + err.message));
 }
- 
+
 function attemptRejoin(code){
   if(!db) return;
   db.ref('rooms/' + code).get().then(snap => {
@@ -590,7 +632,7 @@ function attemptRejoin(code){
     }
   }).catch(()=>{});
 }
- 
+
 function enterRoom(code){
   roomCode = code;
   roomRef = db.ref('rooms/' + code);
@@ -601,7 +643,7 @@ function enterRoom(code){
   showScreen('screen-lobby');
   roomRef.on('value', onRoomUpdate);
 }
- 
+
 function leaveRoom(){
   const code = roomCode;
   if(roomRef){
@@ -626,22 +668,22 @@ function leaveRoom(){
   roomRef = null; roomCode = ''; isHost = false; roomState = null; lastRenderedTurn = -1;
   showScreen('screen-landing');
 }
- 
+
 /* ---------- oda durumu dinleme ---------- */
 function onRoomUpdate(snap){
   const data = snap.val();
   if(!data){ toast('Oda kapatıldı'); localStorage.removeItem('cb_roomCode'); showScreen('screen-landing'); return; }
   roomState = data;
   isHost = (data.hostId === myId);
- 
+
   const players = data.players || {};
   const count = Object.keys(players).length;
- 
+
   // Oda sahibi ayrıldıysa veya bağlantısı koptuysa, en eski katılan oyuncu otomatik devralır
   if(count > 0 && (!players[data.hostId] || players[data.hostId].connected === false)){
     maybeClaimHost(players, data.hostId);
   }
- 
+
   if(data.status === 'lobby' || !data.status){
     clearInterval(window.__timerInterval);
     renderLobby(players, count);
@@ -661,7 +703,7 @@ function onRoomUpdate(snap){
     showScreen('screen-gameend');
   }
 }
- 
+
 function maybeClaimHost(players, currentHostId){
   const connectedIds = Object.keys(players).filter(id => players[id].connected !== false);
   if(connectedIds.length === 0) return;
@@ -670,7 +712,7 @@ function maybeClaimHost(players, currentHostId){
     roomRef.child('hostId').transaction(cur => (cur === currentHostId ? myId : cur));
   }
 }
- 
+
 /* ---------- lobby ---------- */
 function renderLobby(players, count){
   document.getElementById('lobby-count').textContent = '(' + count + '/' + MAX_PLAYERS + ')';
@@ -694,8 +736,33 @@ function renderLobby(players, count){
     startBtn.disabled = !isHost;
   }
   startBtn.style.display = isHost ? 'inline-flex' : 'none';
+  renderModeSelect();
 }
- 
+
+/* ---- oyun modu seçimi (lobby) ---- */
+const MODE_DESCS = {
+  normal: 'Çizen kişi kelimeyi görür ve çizer, diğerleri tahmin eder.',
+  blind:  'Çizen kelimeyi GÖRMEZ! Diğerleri kelimeyi görür ve sözlü ipuçlarıyla çizeni yönlendirir.'
+};
+function renderModeSelect(){
+  const mode = (roomState && roomState.gameMode) || 'normal';
+  document.querySelectorAll('.mode-opt').forEach(opt => {
+    const isActive = opt.dataset.mode === mode;
+    opt.classList.toggle('active', isActive);
+    // Sadece oda sahibi değiştirebilir; diğer oyuncular seçili modu görür ama tıklayamaz
+    opt.disabled = !isHost;
+    opt.classList.toggle('locked', !isHost && !isActive);
+  });
+  const desc = document.getElementById('mode-desc');
+  if(desc) desc.textContent = MODE_DESCS[mode] || MODE_DESCS.normal;
+}
+function setGameMode(mode){
+  if(!isHost || !roomRef) return;
+  if(mode !== 'normal' && mode !== 'blind') return;
+  roomRef.child('gameMode').set(mode);
+  playSound('tick');
+}
+
 function startGame(){
   if(!isHost || !roomState) return;
   const players = roomState.players || {};
@@ -711,7 +778,7 @@ function startGame(){
     usedWords: [],
   }).then(() => beginTurn(shuffled[0]));
 }
- 
+
 /* ---------- tur başlatma (host) ---------- */
 function beginTurn(drawerId){
   const used = roomState.usedWords || [];
@@ -727,22 +794,31 @@ function beginTurn(drawerId){
     timerEnd: null
   });
 }
- 
+
 function shuffleSample(arr, n){
   const copy = [...arr];
   for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; }
   return copy.slice(0,n);
 }
- 
+
 /* ---------- oyun ekranı render ---------- */
 function renderGameFrame(data, players){
   const turnIndex = data.turnIndex || 0;
   document.getElementById('round-tag').textContent = `Tur ${turnIndex+1}/${data.totalTurns}`;
   renderScoreStrip(players);
- 
+
   const amDrawer = data.drawerId === myId;
+  const blind = data.gameMode === 'blind';
   const wordTag = document.getElementById('word-tag');
- 
+
+  // Oyun ekranındaki mod rozeti
+  const badge = document.getElementById('mode-badge');
+  if(badge){
+    badge.classList.add('show');
+    badge.classList.toggle('blind', blind);
+    badge.textContent = blind ? '🙈 Kör Çizer Modu' : '🎨 Normal Mod';
+  }
+
   // Yeni tura geçildiyse tuval ve akışları o tura özel yollara bağla
   if(turnIndex !== lastRenderedTurn){
     lastRenderedTurn = turnIndex;
@@ -753,12 +829,13 @@ function renderGameFrame(data, players){
     hasGuessedThisRound = false;
     document.getElementById('reaction-bar').style.display = 'none';
   }
- 
+
   if(data.status === 'choosing'){
-    wordTag.textContent = '✏️ seçiyor…';
+    // Kör çizer modunda çizen kelime seçmez; host otomatik seçer
+    wordTag.textContent = blind ? 'Kelime seçiliyor…' : '✏️ seçiyor…';
     document.getElementById('timer-bar').style.width = '100%';
     document.getElementById('timer-bar').style.background = 'var(--brand)';
-    if(amDrawer){
+    if(amDrawer && !blind){
       openWordModal(data.wordChoices || []);
     } else {
       closeWordModal();
@@ -768,15 +845,20 @@ function renderGameFrame(data, players){
   } else if(data.status === 'drawing'){
     closeWordModal();
     const word = data.currentWord || '';
-    wordTag.textContent = amDrawer ? word.toUpperCase() : maskWord(word, new Set());
+    if(blind){
+      // Çizen kelimeyi görmez; tahmin edenler kelimeyi açıkça görür
+      wordTag.textContent = amDrawer ? '🙈 KÖR ÇİZER' : word.toUpperCase();
+    } else {
+      wordTag.textContent = amDrawer ? word.toUpperCase() : maskWord(word, new Set());
+    }
     setCanvasInteractive(amDrawer);
     const alreadyGuessed = amDrawer || (data.roundCorrectIds && data.roundCorrectIds[myId]);
     setGuessInteractive(!alreadyGuessed);
     document.getElementById('reaction-bar').style.display = (alreadyGuessed && !amDrawer) ? 'flex' : 'none';
-    updateTimerBar(data.timerEnd, word, amDrawer);
+    updateTimerBar(data.timerEnd, word, amDrawer, blind);
   }
 }
- 
+
 function renderScoreStrip(players){
   const strip = document.getElementById('score-strip');
   strip.innerHTML = '';
@@ -788,12 +870,12 @@ function renderScoreStrip(players){
     strip.appendChild(chip);
   });
 }
- 
+
 /* ---------- kelime maskeleme + ilerleyen ipuçları ---------- */
 function maskWord(word, revealSet){
   return word.split('').map((ch,i) => ch===' ' ? '  ' : (revealSet.has(i) ? ch.toUpperCase() : '_')).join(' ');
 }
- 
+
 // Kelimeye özgü, tüm oyuncularda aynı sonucu üreten (deterministik) bir harf açma sırası
 function hintOrder(word){
   const idxs = [];
@@ -804,7 +886,7 @@ function hintOrder(word){
   for(let i=idxs.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [idxs[i],idxs[j]]=[idxs[j],idxs[i]]; }
   return idxs;
 }
- 
+
 function getRevealSet(word, timerEnd){
   if(!word) return new Set();
   const total = DRAW_SECONDS*1000;
@@ -819,7 +901,7 @@ function getRevealSet(word, timerEnd){
   }
   return new Set(hintOrder(word).slice(0, revealCount));
 }
- 
+
 /* ---------- kelime seçimi ---------- */
 function openWordModal(choices){
   const modal = document.getElementById('word-modal');
@@ -832,7 +914,7 @@ function openWordModal(choices){
   });
 }
 function closeWordModal(){ document.getElementById('word-modal').classList.remove('active'); }
- 
+
 function pickWord(word){
   closeWordModal();
   const used = roomState.usedWords || [];
@@ -844,9 +926,9 @@ function pickWord(word){
     wordChoices: null
   });
 }
- 
+
 /* ---------- zamanlayıcı ---------- */
-function updateTimerBar(timerEnd, word, amDrawer){
+function updateTimerBar(timerEnd, word, amDrawer, blind){
   if(!timerEnd) return;
   const total = DRAW_SECONDS * 1000;
   let lastTickSecond = null;
@@ -857,7 +939,8 @@ function updateTimerBar(timerEnd, word, amDrawer){
     bar.style.width = pct + '%';
     bar.style.background = pct < 25 ? 'var(--danger)' : (pct < 55 ? 'var(--mustard)' : 'var(--brand)');
     if(!amDrawer && roomState && roomState.status === 'drawing'){
-      document.getElementById('word-tag').textContent = maskWord(word, getRevealSet(word, timerEnd));
+      // Kör çizer modunda tahmin edenler kelimeyi tam görür; normal modda kademeli ipucu maskesi
+      document.getElementById('word-tag').textContent = blind ? word.toUpperCase() : maskWord(word, getRevealSet(word, timerEnd));
     }
     const sec = Math.ceil(remaining/1000);
     if(pct < 25 && pct > 0 && sec !== lastTickSecond){ lastTickSecond = sec; playSound('tick'); }
@@ -869,15 +952,20 @@ function updateTimerBar(timerEnd, word, amDrawer){
     if(Date.now() >= timerEnd) clearInterval(window.__timerInterval);
   }, 250);
 }
- 
+
 function hostWatchTimer(data){
   clearHostTimer();
   if(data.status === 'choosing'){
-    // Çizen kişi süresinde kelime seçmezse otomatik seçilir, oyun kilitlenmez
+    const blind = data.gameMode === 'blind';
+    // Kör çizer modunda çizen kelimeyi seçmez -> host hızlıca rastgele seçer.
+    // Normal modda çizen seçmezse süre dolunca ilk kelime otomatik seçilir.
+    const delay = blind ? 1200 : WORD_PICK_SECONDS * 1000;
     hostTimer = setTimeout(() => {
       if(roomState && roomState.status === 'choosing' && roomRef){
         const choices = roomState.wordChoices || [];
-        const word = choices[0] || WORDS[Math.floor(Math.random()*WORDS.length)];
+        const word = blind
+          ? (choices[Math.floor(Math.random()*choices.length)] || WORDS[Math.floor(Math.random()*WORDS.length)])
+          : (choices[0] || WORDS[Math.floor(Math.random()*WORDS.length)]);
         const used = roomState.usedWords || [];
         roomRef.update({
           status: 'drawing',
@@ -887,7 +975,7 @@ function hostWatchTimer(data){
           wordChoices: null
         });
       }
-    }, WORD_PICK_SECONDS * 1000);
+    }, delay);
     return;
   }
   if(data.status !== 'drawing' || !data.timerEnd) return;
@@ -896,7 +984,7 @@ function hostWatchTimer(data){
   hostTimer = setTimeout(() => { finishRound(); }, remaining + 300);
 }
 function clearHostTimer(){ if(hostTimer){ clearTimeout(hostTimer); hostTimer = null; } }
- 
+
 function finishRound(){
   if(!roomRef || !roomState || roomState.status !== 'drawing') return;
   const players = roomState.players || {};
@@ -909,7 +997,7 @@ function finishRound(){
   updates['status'] = 'roundend';
   roomRef.update(updates);
 }
- 
+
 function hostScheduleNextTurn(data){
   clearHostTimer();
   hostTimer = setTimeout(() => {
@@ -922,13 +1010,13 @@ function hostScheduleNextTurn(data){
     }
   }, 4500);
 }
- 
+
 /* ---------- canvas (tuval) ---------- */
 let canvas, ctx;
 function setupCanvas(){
   canvas = document.getElementById('board');
   ctx = canvas.getContext('2d');
- 
+
   // ANA HATA DÜZELTMESİ: tuval, ekranı "display:none" iken 0x0 boyutunda kalıyor
   // ve hiç yeniden boyutlandırılmıyordu — bu yüzden çizim görünmüyor, hatta konum
   // hesaplamaları (0'a bölme) NaN üretiyordu. ResizeObserver + ekran geçişinde
@@ -938,10 +1026,10 @@ function setupCanvas(){
   }
   window.addEventListener('resize', resizeCanvasToDisplaySize);
   resizeCanvasToDisplaySize();
- 
+
   let currentStrokeKey = null;
   let lastPoint = null;
- 
+
   const getPos = (e) => {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -949,7 +1037,7 @@ function setupCanvas(){
     const w = rect.width || 1, h = rect.height || 1;
     return { x: (clientX - rect.left) / w, y: (clientY - rect.top) / h };
   };
- 
+
   const start = (e) => {
     if(canvas.dataset.interactive !== 'true') return;
     e.preventDefault();
@@ -972,7 +1060,7 @@ function setupCanvas(){
     lastPoint = pos;
   };
   const end = () => { drawing = false; currentStrokeKey = null; };
- 
+
   canvas.addEventListener('mousedown', start);
   canvas.addEventListener('mousemove', move);
   window.addEventListener('mouseup', end);
@@ -981,7 +1069,7 @@ function setupCanvas(){
   canvas.addEventListener('touchend', end);
   canvas.addEventListener('touchcancel', end);
 }
- 
+
 function resizeCanvasToDisplaySize(){
   if(!canvas) return;
   const rect = canvas.getBoundingClientRect();
@@ -996,21 +1084,21 @@ function resizeCanvasToDisplaySize(){
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   redrawFromCache();
 }
- 
+
 function redrawFromCache(){
   if(!canvas || !ctx) return;
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0,0,rect.width, rect.height);
   localStrokes.forEach(s => drawSegment(s.p1, s.p2, s.color, s.size));
 }
- 
+
 function setCanvasInteractive(flag){
   canvas.dataset.interactive = flag ? 'true' : 'false';
   canvas.style.cursor = flag ? 'crosshair' : 'default';
   document.getElementById('tools').style.opacity = flag ? '1' : '.4';
   document.getElementById('tools').style.pointerEvents = flag ? 'auto' : 'none';
 }
- 
+
 function drawSegment(p1, p2, color, size){
   const rect = canvas.getBoundingClientRect();
   ctx.strokeStyle = color;
@@ -1020,13 +1108,13 @@ function drawSegment(p1, p2, color, size){
   ctx.lineTo(p2.x * rect.width, p2.y * rect.height);
   ctx.stroke();
 }
- 
+
 function pushSegment(strokeKey, p1, p2, color, size){
   if(!strokesRef) return null;
   const ref = strokesRef.push({ strokeKey, p1, p2, color, size, t: Date.now() });
   return ref.key;
 }
- 
+
 function attachStrokeListener(turnIndex){
   detachStrokeListener();
   localStrokes = [];
@@ -1047,13 +1135,13 @@ function attachStrokeListener(turnIndex){
   strokeUnsub = () => { strokesRef.off('child_added', addedHandler); strokesRef.off('child_removed', removedHandler); };
 }
 function detachStrokeListener(){ if(strokeUnsub){ strokeUnsub(); strokeUnsub = null; } }
- 
+
 function resetCanvasVisual(){
   if(!canvas || !ctx) return;
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0,0,rect.width, rect.height);
 }
- 
+
 function clearCanvas(){
   if(canvas.dataset.interactive !== 'true') return;
   resetCanvasVisual();
@@ -1062,24 +1150,24 @@ function clearCanvas(){
   if(strokesRef) strokesRef.remove();
   playSound('clear');
 }
- 
+
 function undoLastStroke(){
   if(canvas.dataset.interactive !== 'true') return;
   if(strokeHistory.length === 0){ toast('Geri alınacak çizgi yok'); return; }
   const entry = strokeHistory.pop();
   entry.keys.forEach(k => { if(k && strokesRef) strokesRef.child(k).remove(); });
 }
- 
+
 /* ---------- tahmin / sohbet ---------- */
 function setGuessInteractive(flag){
   document.getElementById('input-guess').disabled = !flag;
   document.getElementById('btn-guess').disabled = !flag;
 }
- 
+
 function normalize(str){
   return (str||'').toLocaleLowerCase('tr-TR').trim().replace(/\s+/g,' ');
 }
- 
+
 // Basit Levenshtein mesafesi — "çok yaklaştın" ipucu için kullanılır, otomatik doğrulamaz
 function levenshtein(a, b){
   const m = a.length, n = b.length;
@@ -1095,7 +1183,7 @@ function levenshtein(a, b){
   }
   return dp[m][n];
 }
- 
+
 function sendGuess(){
   const input = document.getElementById('input-guess');
   const text = input.value.trim();
@@ -1107,7 +1195,7 @@ function sendGuess(){
   const players = roomState.players || {};
   const msg = { name: players[myId]?.name || myName, text, correct: isCorrect, uid: myId, t: Date.now() };
   if(guessesRef) guessesRef.push(msg);
- 
+
   if(isCorrect){
     const remaining = roomState.timerEnd ? Math.max(0, roomState.timerEnd - Date.now()) : 0;
     const points = 30 + Math.round((remaining/(DRAW_SECONDS*1000)) * 40);
@@ -1121,7 +1209,7 @@ function sendGuess(){
     document.getElementById('reaction-bar').style.display = 'flex';
     toast('Doğru bildin! +' + points + ' puan');
     playSound('correct');
- 
+
     // herkes bildiyse turu erken bitir (host tarafında, bağlantısı kopanlar sayılmaz)
     if(isHost){
       const guessers = Object.keys(players).filter(id => id !== roomState.drawerId && players[id].connected !== false);
@@ -1140,7 +1228,7 @@ function sendGuess(){
     }
   }
 }
- 
+
 function attachGuessListener(turnIndex){
   detachGuessListener();
   guessCache = [];
@@ -1156,7 +1244,7 @@ function attachGuessListener(turnIndex){
   guessUnsub = () => guessesRef.off('child_added', handler);
 }
 function detachGuessListener(){ if(guessUnsub){ guessUnsub(); guessUnsub = null; } }
- 
+
 function renderGuessFeed(){
   const feed = document.getElementById('feed');
   const list = [...guessCache].sort((a,b) => a.t - b.t);
@@ -1180,7 +1268,7 @@ function renderGuessFeed(){
   });
   feed.scrollTop = feed.scrollHeight;
 }
- 
+
 /* ---------- emoji tepkileri ---------- */
 function attachReactionListener(turnIndex){
   detachReactionListener();
@@ -1190,12 +1278,12 @@ function attachReactionListener(turnIndex){
   reactionUnsub = () => reactionsRef.off('child_added', handler);
 }
 function detachReactionListener(){ if(reactionUnsub){ reactionUnsub(); reactionUnsub = null; } }
- 
+
 function sendReaction(emoji){
   if(!reactionsRef) return;
   reactionsRef.push({ emoji, uid: myId, t: Date.now() });
 }
- 
+
 function spawnReactionFloat(emoji){
   const layer = document.getElementById('reactions-layer');
   if(!layer) return;
@@ -1206,7 +1294,7 @@ function spawnReactionFloat(emoji){
   layer.appendChild(el);
   setTimeout(() => el.remove(), 1800);
 }
- 
+
 /* ---------- tur sonu / oyun sonu ---------- */
 function renderRoundEnd(data, players){
   document.getElementById('roundend-word').textContent = data.currentWord ? `Kelime: "${data.currentWord}"` : '';
@@ -1215,11 +1303,11 @@ function renderRoundEnd(data, players){
   document.getElementById('roundend-next').textContent = nextIndex >= data.totalTurns ? 'Sonuçlar hesaplanıyor…' : 'Sıradaki çizer hazırlanıyor…';
   playReplay(data.turnIndex || 0);
 }
- 
+
 function renderGameEnd(players){
   renderScoreboard('gameend-scores', players);
 }
- 
+
 function renderScoreboard(containerId, players){
   const el = document.getElementById(containerId);
   el.innerHTML = '';
@@ -1232,7 +1320,7 @@ function renderScoreboard(containerId, players){
     el.appendChild(row);
   });
 }
- 
+
 /* ---------- çizim tekrarı (replay) ---------- */
 function playReplay(turnIndex){
   const replayCanvas = document.getElementById('replay-canvas');
@@ -1246,7 +1334,7 @@ function playReplay(turnIndex){
   rctx.setTransform(ratio,0,0,ratio,0,0);
   rctx.clearRect(0,0,rrect.width, rrect.height);
   rctx.lineCap = 'round'; rctx.lineJoin = 'round';
- 
+
   db.ref('strokes/' + roomCode + '/' + turnIndex).once('value').then(snap => {
     const val = snap.val();
     if(!val) return;
@@ -1268,7 +1356,7 @@ function playReplay(turnIndex){
     step();
   }).catch(()=>{});
 }
- 
+
 function playAgain(){
   if(!isHost || !roomRef) return;
   const players = roomState.players || {};
@@ -1282,7 +1370,7 @@ function playAgain(){
     lastRenderedTurn = -1;
   });
 }
- 
+
 function escapeHtml(s){
   const d = document.createElement('div');
   d.textContent = s;
@@ -1291,4 +1379,3 @@ function escapeHtml(s){
 </script>
 </body>
 </html>
- 
