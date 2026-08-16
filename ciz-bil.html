@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Çiz Bil — Oda Kodu ile Oyna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase (gerçek zamanlı senkronizasyon için) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+  :root{
+    --paper:#FBF5E8;
+    --paper-line: rgba(35,43,61,0.07);
+    --ink:#232B3D;
+    --ink-soft:#5B6478;
+    --card:#FFFFFF;
+    --card-border: rgba(35,43,61,0.10);
+    --brand:#2EC4B6;
+    --brand-dark:#1FA093;
+    --coral:#FF6B6B;
+    --mustard:#FFC145;
+    --violet:#9B87F5;
+    --sky:#4C9AFF;
+    --danger:#E85D5D;
+    --shadow: 0 6px 20px rgba(35,43,61,0.08);
+    --shadow-lg: 0 16px 40px rgba(35,43,61,0.14);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 32px,
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px) 0 0/32px 100%,
+      var(--paper);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{ font-family:'Fredoka',sans-serif; font-weight:600; letter-spacing:-0.01em; }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; }
+  input{ font-family:'Inter',sans-serif; }
+  ::selection{ background: var(--brand); color:white; }
+
+  .screen{ display:none; min-height:100vh; width:100%; padding:20px; }
+  .screen.active{ display:flex; flex-direction:column; align-items:center; }
+
+  /* ---------- Ortak bileşenler ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .btn{
+    border:none; border-radius:14px; padding:14px 22px; font-weight:600; font-size:15px;
+    transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-primary{ background:var(--brand); color:#fff; box-shadow: 0 4px 0 var(--brand-dark); }
+  .btn-primary:hover{ background:var(--brand-dark); }
+  .btn-primary:active{ box-shadow:0 1px 0 var(--brand-dark); transform: translateY(3px) scale(0.99); }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--card-border); }
+  .btn-ghost:hover{ border-color: var(--ink-soft); color:var(--ink); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
+
+  .field{
+    width:100%; padding:14px 16px; border-radius:14px; border:1.5px solid var(--card-border);
+    background:#fff; font-size:15px; color:var(--ink); outline:none; transition:border-color .15s;
+  }
+  .field:focus{ border-color:var(--brand); }
+  .field.code-field{ text-transform:uppercase; letter-spacing:6px; text-align:center; font-weight:700; font-size:20px; font-family:'Fredoka',sans-serif; }
+
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; font-size:13px; font-weight:600; }
+
+  /* ---------- Logo / doodle ---------- */
+  .logo-wrap{ display:flex; flex-direction:column; align-items:center; margin: 28px 0 18px; }
+  .logo-wrap svg{ width:220px; height:70px; }
+  .logo-path{ fill:none; stroke:var(--ink); stroke-width:6; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 1.6s ease forwards; }
+  .logo-underline{ fill:none; stroke:var(--coral); stroke-width:6; stroke-linecap:round;
+    stroke-dasharray: 260; stroke-dashoffset:260; animation: draw 0.8s ease forwards 1.4s; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  .tagline{ color:var(--ink-soft); font-size:15px; margin-top:2px; text-align:center; }
+
+  /* ---------- Landing ---------- */
+  #screen-landing{ justify-content:flex-start; padding-top:6vh; }
+  .landing-card{ width:100%; max-width:400px; padding:28px; display:flex; flex-direction:column; gap:14px; }
+  .name-row label, .join-row label{ font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; display:block; }
+  .divider{ display:flex; align-items:center; gap:12px; color:var(--ink-soft); font-size:13px; margin:6px 0; }
+  .divider::before,.divider::after{ content:""; flex:1; height:1px; background:var(--card-border); }
+  .join-row{ display:flex; gap:8px; }
+  .join-row .field{ flex:1; }
+  .setup-warning{ max-width:440px; margin:8px auto; padding:16px 18px; border-radius:14px; background:#FFF3E0; border:1.5px solid #FFD199; font-size:14px; line-height:1.55; }
+  .setup-warning code{ background:#00000010; padding:1px 6px; border-radius:6px; font-size:12.5px; }
+
+  /* ---------- Lobby ---------- */
+  #screen-lobby{ justify-content:flex-start; padding-top:5vh; gap:18px; }
+  .room-sticker{
+    background:#FFF8DE; border:2px dashed #E8CE7B; border-radius:14px; padding:14px 30px;
+    display:flex; flex-direction:column; align-items:center; transform: rotate(-1.5deg); box-shadow: var(--shadow);
+    cursor:pointer; user-select:none;
+  }
+  .room-sticker span.label{ font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; }
+  .room-sticker span.code{ font-family:'Fredoka',sans-serif; font-size:34px; font-weight:700; letter-spacing:8px; color:var(--ink); }
+  .room-sticker .hint{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+
+  .lobby-card{ width:100%; max-width:420px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+  .player-list{ display:flex; flex-direction:column; gap:8px; }
+  .player-chip{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:#F7F3E8; }
+  .dot{ width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .player-chip .pname{ font-weight:600; flex:1; }
+  .crown{ font-size:14px; }
+  .lobby-note{ font-size:13px; color:var(--ink-soft); text-align:center; }
+
+  /* ---------- Game ---------- */
+  #screen-game{ padding-top:14px; gap:12px; max-width:960px; margin:0 auto; width:100%; }
+  .game-top{ width:100%; display:flex; align-items:center; gap:14px; }
+  .timer-wrap{ flex:1; height:14px; border-radius:999px; background:#00000010; overflow:hidden; }
+  .timer-bar{ height:100%; background:var(--brand); border-radius:999px; transition: width 1s linear, background .3s; }
+  .round-tag{ font-size:13px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
+  .word-tag{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:20px; letter-spacing:4px; white-space:nowrap; }
+
+  .score-strip{ display:flex; gap:8px; flex-wrap:wrap; width:100%; }
+  .score-chip{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--card-border); font-size:13px; font-weight:600; }
+  .score-chip.me{ border-color: var(--brand); }
+  .score-chip .dot{ width:9px; height:9px; }
+
+  .game-body{ display:flex; gap:14px; width:100%; flex:1; }
+  .canvas-card{ flex:2; padding:10px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  #board{ width:100%; aspect-ratio:4/3; background:#fff; border-radius:12px; border:2px solid var(--card-border); touch-action:none; cursor:crosshair; }
+  .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .swatch{ width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--card-border); cursor:pointer; }
+  .swatch.active{ box-shadow:0 0 0 2.5px var(--ink); }
+  .size-dot{ border-radius:50%; background:var(--ink); cursor:pointer; opacity:.35; }
+  .size-dot.active{ opacity:1; }
+  .tools .spacer{ flex:1; }
+
+  .side-card{ flex:1; min-width:230px; max-width:300px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .feed{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; max-height:360px; padding-right:2px; }
+  .feed-msg{ font-size:13.5px; padding:8px 10px; border-radius:10px; background:#F7F3E8; line-height:1.4; }
+  .feed-msg.correct{ background:#DFF6EA; color:#1B7A46; font-weight:600; }
+  .feed-msg.system{ background:transparent; color:var(--ink-soft); font-style:italic; padding:2px 4px; }
+  .guess-row{ display:flex; gap:6px; }
+  .guess-row .field{ padding:10px 12px; }
+
+  .word-modal{
+    position:fixed; inset:0; background:rgba(35,43,61,0.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .word-modal.active{ display:flex; }
+  .word-modal-card{ background:#fff; border-radius:20px; padding:26px; max-width:380px; width:100%; text-align:center; box-shadow:var(--shadow-lg); }
+  .word-choice{ display:block; width:100%; margin-top:10px; padding:14px; border-radius:14px; border:2px solid var(--card-border); background:#FBF5E8; font-family:'Fredoka',sans-serif; font-weight:600; font-size:17px; }
+  .word-choice:hover{ border-color:var(--brand); background:#EAFBF9; }
+
+  /* ---------- Round/Game end ---------- */
+  #screen-roundend, #screen-gameend{ justify-content:flex-start; padding-top:8vh; gap:16px; }
+  .end-card{ width:100%; max-width:420px; padding:26px; display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; }
+  .scoreboard{ width:100%; display:flex; flex-direction:column; gap:8px; }
+  .scoreboard .row{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:#F7F3E8; }
+  .scoreboard .row.top1{ background:linear-gradient(90deg,#FFF3C4,#FFF8DE); }
+  .scoreboard .medal{ width:22px; text-align:center; }
+  .scoreboard .sname{ flex:1; font-weight:600; }
+  .scoreboard .spts{ font-weight:700; color:var(--ink-soft); }
+
+  .top-bar{ position:fixed; top:14px; left:14px; display:flex; gap:8px; z-index:10; }
+  .icon-btn{ width:38px; height:38px; border-radius:12px; background:#fff; border:1.5px solid var(--card-border); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:var(--shadow); }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:12px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition: all .25s ease; z-index:80; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:720px){
+    .game-body{ flex-direction:column; }
+    .side-card{ max-width:none; }
+    .feed{ max-height:180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ KURULUM UYARISI ============ -->
+<section class="screen" id="screen-setup">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 220 70"><path class="logo-path" d="M10 55 Q 40 10 70 45 T 130 40 Q 150 15 170 45 T 210 30"/></svg>
+  </div>
+  <div class="setup-warning" style="max-width:520px;">
+    <b>⚙️ Son bir adım kaldı:</b> Bu oyun cihazlar arasında gerçek zamanlı senkronizasyon için ücretsiz bir Firebase veritabanı kullanıyor. Kodun en başındaki <code>FIREBASE_CONFIG</code> alanı henüz boş. Aşağıdaki adımları izle:
+    <ol style="padding-left:18px; margin:10px 0;">
+      <li><a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> adresine git, ücretsiz bir proje oluştur.</li>
+      <li>Sol menüden <b>Build → Realtime Database</b> seç, "Oluştur"a bas, test modunda başlat.</li>
+      <li>Database kurallarını (Rules sekmesi) şu şekilde ayarla: <code>{"rules": {".read": true, ".write": true}}</code></li>
+      <li>Proje ayarları (⚙️) → "Genel" sekmesinden "Web uygulaması ekle" ile <b>firebaseConfig</b> nesnesini kopyala.</li>
+      <li>index.html dosyasını bir metin editöründe aç, en üstteki <code>FIREBASE_CONFIG = {...}</code> satırını kendi bilgilerinle değiştir, kaydet.</li>
+    </ol>
+    Bunu bir kere yaptıktan sonra siteyi kim açarsa açsın oda kodu ile birlikte oynayabilir.
+  </div>
+</section>
+
+<!-- ============ ANA EKRAN ============ -->
+<section class="screen" id="screen-landing">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 220 70">
+      <path class="logo-path" d="M12 45 Q20 15 32 40 Q40 55 48 25 Q54 8 60 40 M75 45 L75 15 L95 15 M75 30 L90 30 M105 45 L105 15 M118 15 L132 15 Q140 15 140 24 Q140 30 132 30 L118 30 M150 45 L165 15 L180 45 M155 35 L175 35"/>
+      <path class="logo-underline" d="M10 58 Q 100 68 200 55"/>
+    </svg>
+  </div>
+  <p class="tagline">3–5 kişilik canlı çiz-bil partisi. Oda aç, kodu paylaş, çizmeye başla.</p>
+
+  <div class="card landing-card">
+    <div class="name-row">
+      <label for="input-name">Adın</label>
+      <input id="input-name" class="field" maxlength="14" placeholder="Rumuzun ne olsun?">
+    </div>
+
+    <button class="btn btn-primary" id="btn-create-room" style="width:100%;">🎨 Yeni Oda Kur</button>
+
+    <div class="divider">veya bir odaya katıl</div>
+
+    <div class="join-row">
+      <input id="input-code" class="field code-field" maxlength="4" placeholder="KOD">
+      <button class="btn btn-primary" id="btn-join-room">Katıl</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOBBY ============ -->
+<section class="screen" id="screen-lobby">
+  <div class="room-sticker" id="room-code-sticker" title="Kopyalamak için tıkla">
+    <span class="label">Oda Kodu · Kopyala</span>
+    <span class="code" id="lobby-code">----</span>
+    <span class="hint">Arkadaşların bu kodu girip katılabilir</span>
+  </div>
+
+  <div class="card lobby-card">
+    <h3 style="margin:0 0 2px;">Oyuncular <span id="lobby-count" style="color:var(--ink-soft); font-weight:500; font-size:14px;"></span></h3>
+    <div class="player-list" id="lobby-players"></div>
+    <p class="lobby-note" id="lobby-note">En az 3 oyuncu bekleniyor…</p>
+    <button class="btn btn-primary" id="btn-start-game" style="width:100%;" disabled>Oyunu Başlat</button>
+    <button class="btn btn-ghost" id="btn-leave-lobby" style="width:100%;">Odadan Ayrıl</button>
+  </div>
+</section>
+
+<!-- ============ OYUN EKRANI ============ -->
+<section class="screen" id="screen-game">
+  <div class="game-top">
+    <span class="round-tag" id="round-tag">Tur 1/6</span>
+    <div class="timer-wrap"><div class="timer-bar" id="timer-bar" style="width:100%;"></div></div>
+    <span class="word-tag" id="word-tag">_ _ _ _</span>
+  </div>
+
+  <div class="score-strip" id="score-strip"></div>
+
+  <div class="game-body">
+    <div class="card canvas-card">
+      <canvas id="board"></canvas>
+      <div class="tools" id="tools">
+        <div class="swatch active" data-color="#232B3D" style="background:#232B3D;"></div>
+        <div class="swatch" data-color="#E85D5D" style="background:#E85D5D;"></div>
+        <div class="swatch" data-color="#2EC4B6" style="background:#2EC4B6;"></div>
+        <div class="swatch" data-color="#FFC145" style="background:#FFC145;"></div>
+        <div class="swatch" data-color="#4C9AFF" style="background:#4C9AFF;"></div>
+        <div class="swatch" data-color="#9B87F5" style="background:#9B87F5;"></div>
+        <div class="swatch" data-color="#FFFFFF" style="background:#FFFFFF;"></div>
+        <span style="width:1px; height:20px; background:var(--card-border); margin:0 4px;"></span>
+        <div class="size-dot" data-size="3" style="width:8px;height:8px;"></div>
+        <div class="size-dot active" data-size="6" style="width:14px;height:14px;"></div>
+        <div class="size-dot" data-size="12" style="width:20px;height:20px;"></div>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" id="btn-clear" style="padding:8px 14px; font-size:13px;">🧹 Temizle</button>
+      </div>
+    </div>
+
+    <div class="card side-card">
+      <div class="feed" id="feed"></div>
+      <div class="guess-row">
+        <input id="input-guess" class="field" placeholder="Tahminini yaz…">
+        <button class="btn btn-primary" id="btn-guess" style="padding:10px 16px;">➤</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TUR SONU ============ -->
+<section class="screen" id="screen-roundend">
+  <div class="card end-card">
+    <h2 style="margin:0;">Tur bitti!</h2>
+    <p id="roundend-word" style="color:var(--ink-soft); margin:0;"></p>
+    <div class="scoreboard" id="roundend-scores"></div>
+    <p class="lobby-note" id="roundend-next">Sıradaki çizer için hazırlanıyor…</p>
+  </div>
+</section>
+
+<!-- ============ OYUN SONU ============ -->
+<section class="screen" id="screen-gameend">
+  <div class="card end-card">
+    <h2 style="margin:0;">🎉 Oyun Bitti!</h2>
+    <div class="scoreboard" id="gameend-scores"></div>
+    <button class="btn btn-primary" id="btn-play-again" style="width:100%;">Tekrar Oyna</button>
+    <button class="btn btn-ghost" id="btn-back-home" style="width:100%;">Ana Sayfaya Dön</button>
+  </div>
+</section>
+
+<!-- ============ KELİME SEÇİM MODALI ============ -->
+<div class="word-modal" id="word-modal">
+  <div class="word-modal-card">
+    <h3 style="margin:0 0 4px;">Sıra sende, çizecek kelimeni seç!</h3>
+    <p style="color:var(--ink-soft); margin:0; font-size:14px;">Diğerleri bunu göremez.</p>
+    <button class="word-choice" id="choice-0"></button>
+    <button class="word-choice" id="choice-1"></button>
+    <button class="word-choice" id="choice-2"></button>
+  </div>
+</div>
+
+<div class="top-bar" id="top-bar" style="display:none;">
+  <div class="icon-btn" id="btn-copy-code" title="Oda kodunu kopyala">🔗</div>
+</div>
+
+<script>
+/* ======================================================================
+   FIREBASE AYARI — kendi ücretsiz Firebase projenin bilgilerini buraya yapıştır.
+   console.firebase.google.com > Proje Ayarları > Web Uygulaması Ekle
+====================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD2l-yW7XlrfjY67zllOkrrSPDyAeoo4zw",
+  authDomain: "ciz-bil-oyunu.firebaseapp.com",
+  databaseURL: "https://ciz-bil-oyunu-default-rtdb.firebaseio.com",
+  projectId: "ciz-bil-oyunu",
+  storageBucket: "ciz-bil-oyunu.firebasestorage.app",
+  messagingSenderId: "283583521162",
+  appId: "1:283583521162:web:4d50431b176aa0a5c6e873"
+};
+/* ====================================================================== */
+
+const WORDS = ["Kedi","Köpek","Uçak","Araba","Güneş","Ay","Yıldız","Deniz","Balık","Kuş",
+"Ağaç","Çiçek","Ev","Kale","Gemi","Roket","Robot","Piyano","Gitar","Pizza",
+"Hamburger","Dondurma","Pasta","Kahve","Şemsiye","Gözlük","Şapka","Ayakkabı","Saat","Telefon",
+"Bilgisayar","Kamera","Top","Bisiklet","Motosiklet","Tren","Uçurtma","Balon","Mum","Anahtar",
+"Kilit","Kapı","Pencere","Merdiven","Köprü","Dağ","Nehir","Orman","Çöl","Ada",
+"Volkan","Gökkuşağı","Kar","Yağmur","Şimşek","Ejderha","Hayalet","Örümcek","Arı","Kelebek",
+"Fil","Zürafa","Aslan","Penguen","Timsah","Tavşan","Ayı","Kaplumbağa","Yılan","Baykuş",
+"Cüzdan","Çanta","Kalem","Makas","Defter","Kitap","Ampul","Sandalye","Masa","Dolap",
+"Cetvel","Fırça","Ayna","Terazi","Anahtarlık","Bavul","Harita","Pusula","Fener","Kutu"];
+
+const PLAYER_COLORS = ["#FF6B6B","#2EC4B6","#FFC145","#9B87F5","#4C9AFF"];
+const ROUNDS_PER_PLAYER = 2;
+const DRAW_SECONDS = 75;
+const MIN_PLAYERS = 3;
+const MAX_PLAYERS = 5;
+
+let db, roomRef;
+let myId = localStorage.getItem('cb_myId') || ('p_' + Math.random().toString(36).slice(2,10));
+localStorage.setItem('cb_myId', myId);
+let myName = '';
+let roomCode = '';
+let isHost = false;
+let roomState = null;
+let strokeUnsub = null;
+let hostTimer = null;
+let lastRenderedRound = -1, lastRenderedTurn = -1;
+let drawing = false;
+let currentColor = "#232B3D";
+let currentSize = 6;
+let hasGuessedThisRound = false;
+
+/* ---------- ekran yönetimi ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('top-bar').style.display = (id==='screen-lobby'||id==='screen-game') ? 'flex' : 'none';
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------- başlangıç ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.databaseURL){
+    showScreen('screen-setup');
+    return;
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+  showScreen('screen-landing');
+
+  const savedName = localStorage.getItem('cb_myName');
+  if(savedName) document.getElementById('input-name').value = savedName;
+
+  document.getElementById('btn-create-room').onclick = createRoom;
+  document.getElementById('btn-join-room').onclick = joinRoom;
+  document.getElementById('input-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
+  document.getElementById('input-code').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
+  document.getElementById('input-name').addEventListener('keydown', e => { if(e.key==='Enter') createRoom(); });
+
+  document.getElementById('room-code-sticker').onclick = copyCode;
+  document.getElementById('btn-copy-code').onclick = copyCode;
+  document.getElementById('btn-start-game').onclick = startGame;
+  document.getElementById('btn-leave-lobby').onclick = leaveRoom;
+  document.getElementById('btn-play-again').onclick = playAgain;
+  document.getElementById('btn-back-home').onclick = () => { leaveRoom(); };
+
+  document.getElementById('btn-clear').onclick = clearCanvas;
+  document.getElementById('btn-guess').onclick = sendGuess;
+  document.getElementById('input-guess').addEventListener('keydown', e => { if(e.key==='Enter') sendGuess(); });
+
+  document.querySelectorAll('.swatch').forEach(sw => sw.onclick = () => {
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    currentColor = sw.dataset.color;
+  });
+  document.querySelectorAll('.size-dot').forEach(sd => sd.onclick = () => {
+    document.querySelectorAll('.size-dot').forEach(s=>s.classList.remove('active'));
+    sd.classList.add('active');
+    currentSize = parseInt(sd.dataset.size);
+  });
+
+  setupCanvas();
+});
+
+function getName(){
+  const n = document.getElementById('input-name').value.trim() || 'Oyuncu';
+  localStorage.setItem('cb_myName', n);
+  return n;
+}
+function randomCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for(let i=0;i<4;i++) c += chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+function copyCode(){
+  navigator.clipboard?.writeText(roomCode).then(()=>toast('Oda kodu kopyalandı: ' + roomCode)).catch(()=>toast('Kod: ' + roomCode));
+}
+
+/* ---------- oda oluştur / katıl ---------- */
+function createRoom(){
+  myName = getName();
+  roomCode = randomCode();
+  const ref = db.ref('rooms/' + roomCode);
+  isHost = true;
+  const playerObj = {};
+  playerObj[myId] = { name: myName, color: PLAYER_COLORS[0], score: 0, joinedAt: Date.now() };
+  ref.set({
+    status: 'lobby',
+    hostId: myId,
+    players: playerObj,
+    createdAt: Date.now()
+  }).then(() => enterRoom(roomCode)).catch(err => toast('Hata: ' + err.message));
+}
+
+function joinRoom(){
+  myName = getName();
+  const code = document.getElementById('input-code').value.trim().toUpperCase();
+  if(code.length < 4){ toast('4 haneli oda kodunu gir'); return; }
+  const ref = db.ref('rooms/' + code);
+  ref.get().then(snap => {
+    if(!snap.exists()){ toast('Bu kodla bir oda bulunamadı'); return; }
+    const data = snap.val();
+    const players = data.players || {};
+    if(!players[myId] && Object.keys(players).length >= MAX_PLAYERS){ toast('Oda dolu (max ' + MAX_PLAYERS + ' kişi)'); return; }
+    if(!players[myId]){
+      const usedColors = Object.values(players).map(p=>p.color);
+      const color = PLAYER_COLORS.find(c => !usedColors.includes(c)) || PLAYER_COLORS[0];
+      ref.child('players/' + myId).set({ name: myName, color, score: 0, joinedAt: Date.now() });
+    }
+    isHost = (data.hostId === myId);
+    roomCode = code;
+    enterRoom(code);
+  }).catch(err => toast('Hata: ' + err.message));
+}
+
+function enterRoom(code){
+  roomCode = code;
+  roomRef = db.ref('rooms/' + code);
+  roomRef.onDisconnect(); // no-op placeholder, presence handled lightly
+  roomRef.child('players/' + myId).onDisconnect().update({ connected: false });
+  document.getElementById('lobby-code').textContent = code;
+  showScreen('screen-lobby');
+  roomRef.on('value', onRoomUpdate);
+}
+
+function leaveRoom(){
+  if(roomRef){
+    roomRef.child('players/' + myId).remove();
+    roomRef.off('value', onRoomUpdate);
+  }
+  if(strokeUnsub){ strokeUnsub(); strokeUnsub = null; }
+  clearHostTimer();
+  roomRef = null; roomCode = ''; isHost = false; roomState = null;
+  showScreen('screen-landing');
+}
+
+/* ---------- oda durumu dinleme ---------- */
+function onRoomUpdate(snap){
+  const data = snap.val();
+  if(!data){ toast('Oda kapatıldı'); showScreen('screen-landing'); return; }
+  roomState = data;
+  isHost = (data.hostId === myId);
+
+  const players = data.players || {};
+  const count = Object.keys(players).length;
+
+  if(data.status === 'lobby'){
+    renderLobby(players, count);
+    showScreen('screen-lobby');
+  } else if(data.status === 'choosing' || data.status === 'drawing'){
+    renderGameFrame(data, players);
+    showScreen('screen-game');
+    if(isHost) hostWatchTimer(data);
+  } else if(data.status === 'roundend'){
+    renderRoundEnd(data, players);
+    showScreen('screen-roundend');
+    if(isHost) hostScheduleNextTurn(data);
+  } else if(data.status === 'gameend'){
+    renderGameEnd(players);
+    showScreen('screen-gameend');
+  }
+}
+
+/* ---------- lobby ---------- */
+function renderLobby(players, count){
+  document.getElementById('lobby-count').textContent = '(' + count + '/' + MAX_PLAYERS + ')';
+  const list = document.getElementById('lobby-players');
+  list.innerHTML = '';
+  Object.entries(players).forEach(([id,p]) => {
+    const chip = document.createElement('div');
+    chip.className = 'player-chip';
+    chip.innerHTML = `<span class="dot" style="background:${p.color}"></span><span class="pname">${escapeHtml(p.name)}${id===myId?' (sen)':''}</span>${id===roomState.hostId?'<span class="crown">👑</span>':''}`;
+    list.appendChild(chip);
+  });
+  const startBtn = document.getElementById('btn-start-game');
+  const note = document.getElementById('lobby-note');
+  if(count < MIN_PLAYERS){
+    note.textContent = `En az ${MIN_PLAYERS} oyuncu bekleniyor… (${count}/${MIN_PLAYERS})`;
+    startBtn.disabled = true;
+  } else {
+    note.textContent = isHost ? 'Herkes hazır! Başlatabilirsin.' : 'Oda sahibinin başlatması bekleniyor…';
+    startBtn.disabled = !isHost;
+  }
+  startBtn.style.display = isHost ? 'inline-flex' : 'none';
+}
+
+function startGame(){
+  if(!isHost || !roomState) return;
+  const players = roomState.players || {};
+  const ids = Object.keys(players);
+  if(ids.length < MIN_PLAYERS) return;
+  const shuffled = ids.sort(() => Math.random() - 0.5);
+  const totalTurns = shuffled.length * ROUNDS_PER_PLAYER;
+  roomRef.update({
+    drawOrder: shuffled,
+    turnIndex: 0,
+    totalTurns,
+    usedWords: [],
+  }).then(() => beginTurn(shuffled[0]));
+}
+
+/* ---------- tur başlatma (host) ---------- */
+function beginTurn(drawerId){
+  const used = roomState.usedWords || [];
+  const pool = WORDS.filter(w => !used.includes(w));
+  const source = pool.length >= 3 ? pool : WORDS;
+  const choices = shuffleSample(source, 3);
+  roomRef.update({
+    status: 'choosing',
+    drawerId,
+    wordChoices: choices,
+    currentWord: null,
+    strokes: null,
+    guesses: null,
+    roundCorrectIds: null,
+    timerEnd: null
+  });
+}
+
+function shuffleSample(arr, n){
+  const copy = [...arr];
+  for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; }
+  return copy.slice(0,n);
+}
+
+/* ---------- oyun ekranı render ---------- */
+function renderGameFrame(data, players){
+  const turnIndex = data.turnIndex || 0;
+  document.getElementById('round-tag').textContent = `Tur ${turnIndex+1}/${data.totalTurns}`;
+  renderScoreStrip(players);
+
+  const amDrawer = data.drawerId === myId;
+  const wordTag = document.getElementById('word-tag');
+
+  if(data.status === 'choosing'){
+    wordTag.textContent = '✏️ seçiyor…';
+    document.getElementById('timer-bar').style.width = '100%';
+    if(amDrawer){
+      openWordModal(data.wordChoices || []);
+    } else {
+      closeWordModal();
+    }
+    setCanvasInteractive(false);
+    setGuessInteractive(false);
+  } else if(data.status === 'drawing'){
+    closeWordModal();
+    const word = data.currentWord || '';
+    wordTag.textContent = amDrawer ? word.toUpperCase() : maskWord(word);
+    setCanvasInteractive(amDrawer);
+    const alreadyGuessed = amDrawer || (data.roundCorrectIds && data.roundCorrectIds[myId]);
+    setGuessInteractive(!alreadyGuessed);
+    updateTimerBar(data.timerEnd);
+  }
+
+  // yeni tur ise tuval ve akışı sıfırla
+  const turnKey = turnIndex;
+  if(turnKey !== lastRenderedTurn){
+    lastRenderedTurn = turnKey;
+    resetCanvasVisual();
+    document.getElementById('feed').innerHTML = '';
+    hasGuessedThisRound = false;
+    attachStrokeListener();
+  }
+  renderGuessFeed(data.guesses, players);
+}
+
+function renderScoreStrip(players){
+  const strip = document.getElementById('score-strip');
+  strip.innerHTML = '';
+  Object.entries(players).sort((a,b)=> (b[1].score||0)-(a[1].score||0)).forEach(([id,p]) => {
+    const chip = document.createElement('div');
+    chip.className = 'score-chip' + (id===myId ? ' me' : '');
+    chip.innerHTML = `<span class="dot" style="background:${p.color}"></span>${escapeHtml(p.name)} · ${p.score||0}`;
+    strip.appendChild(chip);
+  });
+}
+
+function maskWord(word){
+  return word.split('').map(ch => ch===' ' ? '  ' : '_').join(' ');
+}
+
+/* ---------- kelime seçimi ---------- */
+function openWordModal(choices){
+  const modal = document.getElementById('word-modal');
+  if(!choices.length){ modal.classList.remove('active'); return; }
+  modal.classList.add('active');
+  choices.forEach((w,i) => {
+    const btn = document.getElementById('choice-' + i);
+    btn.textContent = w;
+    btn.onclick = () => pickWord(w);
+  });
+}
+function closeWordModal(){ document.getElementById('word-modal').classList.remove('active'); }
+
+function pickWord(word){
+  closeWordModal();
+  const used = roomState.usedWords || [];
+  roomRef.update({
+    status: 'drawing',
+    currentWord: word,
+    usedWords: [...used, word],
+    timerEnd: Date.now() + DRAW_SECONDS * 1000,
+    wordChoices: null
+  });
+}
+
+/* ---------- zamanlayıcı ---------- */
+function updateTimerBar(timerEnd){
+  if(!timerEnd) return;
+  const total = DRAW_SECONDS * 1000;
+  const tick = () => {
+    const remaining = Math.max(0, timerEnd - Date.now());
+    const pct = Math.max(0, Math.min(100, (remaining/total)*100));
+    const bar = document.getElementById('timer-bar');
+    bar.style.width = pct + '%';
+    bar.style.background = pct < 25 ? 'var(--danger)' : (pct < 55 ? 'var(--mustard)' : 'var(--brand)');
+  };
+  tick();
+  clearInterval(window.__timerInterval);
+  window.__timerInterval = setInterval(() => {
+    tick();
+    if(Date.now() >= timerEnd) clearInterval(window.__timerInterval);
+  }, 250);
+}
+
+function hostWatchTimer(data){
+  clearHostTimer();
+  if(data.status !== 'drawing' || !data.timerEnd) return;
+  const remaining = data.timerEnd - Date.now();
+  if(remaining <= 0){ finishRound(); return; }
+  hostTimer = setTimeout(() => { finishRound(); }, remaining + 300);
+}
+function clearHostTimer(){ if(hostTimer){ clearTimeout(hostTimer); hostTimer = null; } }
+
+function finishRound(){
+  if(!roomRef || !roomState || roomState.status !== 'drawing') return;
+  const players = roomState.players || {};
+  const correctIds = Object.keys(roomState.roundCorrectIds || {});
+  const bonus = correctIds.length * 10;
+  const updates = {};
+  if(bonus > 0 && roomState.drawerId){
+    updates['players/' + roomState.drawerId + '/score'] = (players[roomState.drawerId]?.score || 0) + bonus;
+  }
+  updates['status'] = 'roundend';
+  roomRef.update(updates);
+}
+
+function hostScheduleNextTurn(data){
+  clearHostTimer();
+  hostTimer = setTimeout(() => {
+    const nextIndex = (data.turnIndex||0) + 1;
+    if(nextIndex >= data.totalTurns){
+      roomRef.update({ status: 'gameend' });
+    } else {
+      const drawer = data.drawOrder[nextIndex];
+      roomRef.update({ turnIndex: nextIndex }).then(() => beginTurn(drawer));
+    }
+  }, 4500);
+}
+
+/* ---------- canvas ---------- */
+let canvas, ctx;
+function setupCanvas(){
+  canvas = document.getElementById('board');
+  ctx = canvas.getContext('2d');
+  const resize = () => {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const imgData = canvas.width>0 ? ctx.getImageData(0,0,canvas.width,canvas.height) : null;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  };
+  window.addEventListener('resize', resize);
+  resize();
+
+  let currentStrokeKey = null;
+  let lastPoint = null;
+
+  const getPos = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - rect.left) / rect.width, y: (clientY - rect.top) / rect.height };
+  };
+
+  const start = (e) => {
+    if(canvas.dataset.interactive !== 'true') return;
+    e.preventDefault();
+    drawing = true;
+    const pos = getPos(e);
+    lastPoint = pos;
+    currentStrokeKey = 's_' + Date.now() + '_' + Math.floor(Math.random()*9999);
+    pushSegment(currentStrokeKey, pos, pos, currentColor, currentSize, true);
+  };
+  const move = (e) => {
+    if(!drawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    drawSegment(lastPoint, pos, currentColor, currentSize);
+    pushSegment(currentStrokeKey, lastPoint, pos, currentColor, currentSize, false);
+    lastPoint = pos;
+  };
+  const end = () => { drawing = false; currentStrokeKey = null; };
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+}
+
+function setCanvasInteractive(flag){
+  canvas.dataset.interactive = flag ? 'true' : 'false';
+  canvas.style.cursor = flag ? 'crosshair' : 'default';
+  document.getElementById('tools').style.opacity = flag ? '1' : '.4';
+  document.getElementById('tools').style.pointerEvents = flag ? 'auto' : 'none';
+}
+
+function drawSegment(p1, p2, color, size){
+  const rect = canvas.getBoundingClientRect();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size;
+  ctx.beginPath();
+  ctx.moveTo(p1.x * rect.width, p1.y * rect.height);
+  ctx.lineTo(p2.x * rect.width, p2.y * rect.height);
+  ctx.stroke();
+}
+
+function pushSegment(strokeKey, p1, p2, color, size, isStart){
+  if(!roomRef) return;
+  roomRef.child('strokes').push({ p1, p2, color, size, t: Date.now() });
+}
+
+function attachStrokeListener(){
+  if(strokeUnsub) strokeUnsub();
+  const ref = roomRef.child('strokes');
+  const handler = (snap) => {
+    const seg = snap.val();
+    if(seg) drawSegment(seg.p1, seg.p2, seg.color, seg.size);
+  };
+  ref.on('child_added', handler);
+  strokeUnsub = () => ref.off('child_added', handler);
+}
+
+function resetCanvasVisual(){
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width, rect.height);
+}
+
+function clearCanvas(){
+  if(canvas.dataset.interactive !== 'true') return;
+  resetCanvasVisual();
+  if(roomRef) roomRef.child('strokes').remove();
+}
+
+/* ---------- tahmin / sohbet ---------- */
+function setGuessInteractive(flag){
+  document.getElementById('input-guess').disabled = !flag;
+  document.getElementById('btn-guess').disabled = !flag;
+}
+
+function normalize(str){
+  return str.toLocaleLowerCase('tr-TR').trim().replace(/\s+/g,' ');
+}
+
+function sendGuess(){
+  const input = document.getElementById('input-guess');
+  const text = input.value.trim();
+  if(!text || !roomState || roomState.status !== 'drawing') return;
+  input.value = '';
+  const word = roomState.currentWord || '';
+  const isCorrect = normalize(text) === normalize(word);
+  const players = roomState.players || {};
+  const msg = { name: players[myId]?.name || myName, text, correct: isCorrect, uid: myId, t: Date.now() };
+  roomRef.child('guesses').push(msg);
+
+  if(isCorrect){
+    const remaining = roomState.timerEnd ? Math.max(0, roomState.timerEnd - Date.now()) : 0;
+    const points = 30 + Math.round((remaining/(DRAW_SECONDS*1000)) * 40);
+    const myScore = players[myId]?.score || 0;
+    roomRef.update({
+      ['players/' + myId + '/score']: myScore + points,
+      ['roundCorrectIds/' + myId]: true
+    });
+    setGuessInteractive(false);
+    toast('Doğru bildin! +' + points + ' puan');
+
+    // herkes bildiyse turu erken bitir (host tarafında)
+    if(isHost){
+      const guessers = Object.keys(players).filter(id => id !== roomState.drawerId);
+      const correctSoFar = Object.keys(roomState.roundCorrectIds || {});
+      if(correctSoFar.length + 1 >= guessers.length){
+        setTimeout(finishRound, 900);
+      }
+    }
+  }
+}
+
+function renderGuessFeed(guesses, players){
+  const feed = document.getElementById('feed');
+  const list = guesses ? Object.values(guesses) : [];
+  list.sort((a,b) => a.t - b.t);
+  feed.innerHTML = '';
+  if(list.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'feed-msg system';
+    empty.textContent = 'Tahminler burada görünecek…';
+    feed.appendChild(empty);
+  }
+  list.forEach(g => {
+    const div = document.createElement('div');
+    if(g.correct){
+      div.className = 'feed-msg correct';
+      div.textContent = `✓ ${g.name} doğru bildi!`;
+    } else {
+      div.className = 'feed-msg';
+      div.textContent = `${g.name}: ${g.text}`;
+    }
+    feed.appendChild(div);
+  });
+  feed.scrollTop = feed.scrollHeight;
+}
+
+/* ---------- tur sonu / oyun sonu ---------- */
+function renderRoundEnd(data, players){
+  document.getElementById('roundend-word').textContent = data.currentWord ? `Kelime: "${data.currentWord}"` : '';
+  renderScoreboard('roundend-scores', players);
+  const nextIndex = (data.turnIndex||0) + 1;
+  document.getElementById('roundend-next').textContent = nextIndex >= data.totalTurns ? 'Sonuçlar hesaplanıyor…' : 'Sıradaki çizer hazırlanıyor…';
+}
+
+function renderGameEnd(players){
+  renderScoreboard('gameend-scores', players);
+}
+
+function renderScoreboard(containerId, players){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const sorted = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
+  const medals = ['🥇','🥈','🥉'];
+  sorted.forEach(([id,p], i) => {
+    const row = document.createElement('div');
+    row.className = 'row' + (i===0 ? ' top1' : '');
+    row.innerHTML = `<span class="medal">${medals[i]||'•'}</span><span class="dot" style="background:${p.color}"></span><span class="sname">${escapeHtml(p.name)}${id===myId?' (sen)':''}</span><span class="spts">${p.score||0}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function playAgain(){
+  if(!isHost || !roomRef) return;
+  const players = roomState.players || {};
+  const resets = {};
+  Object.keys(players).forEach(id => resets['players/' + id + '/score'] = 0);
+  roomRef.update(resets).then(() => {
+    roomRef.update({ status: 'lobby', drawOrder: null, turnIndex: null, totalTurns: null, usedWords: null, drawerId: null, currentWord: null, strokes: null, guesses: null, roundCorrectIds: null, timerEnd: null, wordChoices: null });
+  });
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
