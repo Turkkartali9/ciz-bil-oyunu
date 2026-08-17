@@ -7,11 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
- 
+
 <!-- Firebase (gerçek zamanlı senkronizasyon için) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
- 
+
 <style>
   :root{
     --paper:#FBF5E8;
@@ -48,17 +48,12 @@
   button{ font-family:'Inter',sans-serif; cursor:pointer; }
   input{ font-family:'Inter',sans-serif; }
   ::selection{ background: var(--brand); color:white; }
- 
+
   .screen{ display:none; min-height:100vh; width:100%; padding:20px; }
   .screen.active{ display:flex; flex-direction:column; align-items:center; }
- 
-  /* ---------- Ortak bileşenler ---------- */
-  .card{
-    background:var(--card);
-    border:1px solid var(--card-border);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-  }
+
+  /* ---- Ortak bileşenler ---- */
+  .card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); box-shadow:var(--shadow); }
   .btn{
     border:none; border-radius:14px; padding:14px 22px; font-weight:600; font-size:15px;
     transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
@@ -71,17 +66,19 @@
   .btn-ghost{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--card-border); }
   .btn-ghost:hover{ border-color: var(--ink-soft); color:var(--ink); }
   .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
- 
+  .btn-coral{ background:var(--coral); color:#fff; box-shadow:0 4px 0 #d95555; }
+  .btn-coral:hover{ background:#d95555; }
+
   .field{
     width:100%; padding:14px 16px; border-radius:14px; border:1.5px solid var(--card-border);
     background:#fff; font-size:15px; color:var(--ink); outline:none; transition:border-color .15s;
   }
   .field:focus{ border-color:var(--brand); }
   .field.code-field{ text-transform:uppercase; letter-spacing:6px; text-align:center; font-weight:700; font-size:20px; font-family:'Fredoka',sans-serif; }
- 
+
   .pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; font-size:13px; font-weight:600; }
- 
-  /* ---------- Logo / doodle ---------- */
+
+  /* ---- Logo / doodle ---- */
   .logo-wrap{ display:flex; flex-direction:column; align-items:center; margin: 28px 0 18px; }
   .logo-wrap svg{ width:220px; height:70px; }
   .logo-path{ fill:none; stroke:var(--ink); stroke-width:6; stroke-linecap:round; stroke-linejoin:round;
@@ -90,8 +87,8 @@
     stroke-dasharray: 260; stroke-dashoffset:260; animation: draw 0.8s ease forwards 1.4s; }
   @keyframes draw{ to{ stroke-dashoffset:0; } }
   .tagline{ color:var(--ink-soft); font-size:15px; margin-top:2px; text-align:center; }
- 
-  /* ---------- Landing ---------- */
+
+  /* ---- Landing ---- */
   #screen-landing{ justify-content:flex-start; padding-top:6vh; }
   .landing-card{ width:100%; max-width:400px; padding:28px; display:flex; flex-direction:column; gap:14px; }
   .name-row label, .join-row label{ font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; display:block; }
@@ -101,8 +98,8 @@
   .join-row .field{ flex:1; }
   .setup-warning{ max-width:440px; margin:8px auto; padding:16px 18px; border-radius:14px; background:#FFF3E0; border:1.5px solid #FFD199; font-size:14px; line-height:1.55; }
   .setup-warning code{ background:#EEEEF0; padding:1px 6px; border-radius:6px; font-size:12.5px; }
- 
-  /* ---------- Lobby ---------- */
+
+  /* ---- Lobby ---- */
   #screen-lobby{ justify-content:flex-start; padding-top:5vh; gap:18px; }
   .room-sticker{
     background:#FFF8DE; border:2px dashed #E8CE7B; border-radius:14px; padding:14px 30px;
@@ -112,21 +109,23 @@
   .room-sticker span.label{ font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; }
   .room-sticker span.code{ font-family:'Fredoka',sans-serif; font-size:34px; font-weight:700; letter-spacing:8px; color:var(--ink); }
   .room-sticker .hint{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
- 
-  .lobby-card{ width:100%; max-width:420px; padding:22px; display:flex; flex-direction:column; gap:14px; }
+
+  .lobby-card{ width:100%; max-width:460px; padding:22px; display:flex; flex-direction:column; gap:14px; }
   .player-list{ display:flex; flex-direction:column; gap:8px; }
   .player-chip{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background:#F7F3E8; transition:opacity .2s; }
   .player-chip.offline{ opacity:.5; }
-  .status-dot{ width:8px; height:8px; border-radius:50%; background:#B9BFCC; flex-shrink:0; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .status-dot.off{ background:#B9BFCC; }
   .status-dot.online{ background:#38C172; }
   .dot{ width:12px; height:12px; border-radius:50%; flex-shrink:0; }
   .player-chip .pname{ font-weight:600; flex:1; }
   .crown{ font-size:14px; }
   .lobby-note{ font-size:13px; color:var(--ink-soft); text-align:center; }
- 
-  /* ---- Oyun modu seçici ---- */
-  .mode-select{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:#F7F3E8; }
-  .mode-select .mode-title{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+
+  .group-select{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:#F7F3E8; }
+  .group-select .group-title{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+
+  /* Oyun modu seçici (çiz & bil) */
   .mode-options{ display:flex; gap:8px; }
   .mode-opt{
     flex:1; border:1.5px solid var(--card-border); background:#fff; border-radius:12px; padding:12px 10px;
@@ -136,67 +135,79 @@
   .mode-opt .mode-emoji{ font-size:22px; line-height:1; }
   .mode-opt:hover{ border-color:var(--brand); }
   .mode-opt.active{ border-color:var(--brand); background:#EAFBF9; box-shadow:0 0 0 1.5px var(--brand) inset; }
-  .mode-opt:disabled{ cursor:default; opacity:1; }
+  .mode-opt:disabled{ cursor:default; }
   .mode-opt.locked{ opacity:.55; }
   .mode-desc{ font-size:12.5px; color:var(--ink-soft); text-align:center; margin:0; }
- 
-  /* ---- Oda kapasitesi seçici ---- */
-  .cap-select{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:#F7F3E8; }
-  .cap-select .cap-title{ font-size:13px; font-weight:700; color:var(--ink-soft); }
-  .cap-options{ display:flex; gap:6px; flex-wrap:wrap; }
-  .cap-opt{
-    min-width:32px; border:1.5px solid var(--card-border); background:#fff; border-radius:10px; padding:8px 0;
-    font-weight:700; font-size:13px; color:var(--ink); text-align:center;
+
+  /* Mini oyun kartları */
+  .mini-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .mini-card{
+    border:1.5px solid var(--card-border); background:#fff; border-radius:14px; padding:12px 10px;
+    display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;
     transition:border-color .15s, background .15s, transform .1s;
   }
-  .cap-opt:hover{ border-color:var(--brand); }
-  .cap-opt.active{ border-color:var(--brand); background:#EAFBF9; box-shadow:0 0 0 1.5px var(--brand) inset; }
-  .cap-opt:disabled{ cursor:default; }
-  .cap-opt.locked{ opacity:.55; }
- 
-  /* ---- Kelime kategorisi seçici ---- */
-  .cat-select{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:14px; background:#F7F3E8; }
-  .cat-select .cat-title{ font-size:13px; font-weight:700; color:var(--ink-soft); }
-  .cat-options{ display:flex; gap:8px; flex-wrap:wrap; }
-  .cat-opt{
+  .mini-card:hover{ border-color:var(--violet); transform: translateY(-1px); }
+  .mini-card.active{ border-color:var(--violet); background:#F1EEFF; box-shadow:0 0 0 1.5px var(--violet) inset; }
+  .mini-card:disabled{ cursor:default; }
+  .mini-card.locked{ opacity:.6; }
+  .mini-card .mc-emoji{ font-size:28px; line-height:1; }
+  .mini-card .mc-name{ font-weight:700; font-size:13.5px; }
+  .mini-card .mc-desc{ font-size:11px; color:var(--ink-soft); line-height:1.3; }
+
+  /* Oda kapasitesi / kelime kategorisi */
+  .options-wrap{ display:flex; gap:6px; flex-wrap:wrap; }
+  .opt-chip{
+    border:1.5px solid var(--card-border); background:#fff; border-radius:10px; padding:8px 0;
+    font-weight:700; font-size:13px; color:var(--ink); text-align:center; min-width:32px;
+    transition:border-color .15s, background .15s;
+  }
+  .opt-pill{
     border:1.5px solid var(--card-border); background:#fff; border-radius:999px; padding:8px 14px;
     font-weight:600; font-size:13px; color:var(--ink); display:inline-flex; align-items:center; gap:6px;
     transition:border-color .15s, background .15s;
   }
-  .cat-opt:hover{ border-color:var(--brand); }
-  .cat-opt.active{ border-color:var(--brand); background:#EAFBF9; box-shadow:0 0 0 1.5px var(--brand) inset; }
-  .cat-opt:disabled{ cursor:default; }
-  .cat-opt.locked{ opacity:.55; }
- 
-  /* ---- Ana menü butonu vurgusu ---- */
+  .opt-chip:hover,.opt-pill:hover{ border-color:var(--brand); }
+  .opt-chip.active,.opt-pill.active{ border-color:var(--brand); background:#EAFBF9; box-shadow:0 0 0 1.5px var(--brand) inset; }
+  .opt-chip:disabled,.opt-pill:disabled{ cursor:default; }
+  .opt-chip.locked,.opt-pill.locked{ opacity:.5; }
+  .dim{ opacity:.45; pointer-events:none; filter:grayscale(.3); }
+
   .icon-btn.home-btn{ color:var(--coral); font-size:17px; }
- 
-  /* ---- Oyun ekranındaki mod rozeti ---- */
+
   .mode-badge{
     display:none; align-self:center; align-items:center; gap:6px; padding:5px 14px; border-radius:999px;
     font-size:13px; font-weight:700; background:#FFF8DE; border:1.5px solid #E8CE7B; color:var(--ink);
   }
   .mode-badge.show{ display:inline-flex; }
   .mode-badge.blind{ background:#EDE8FF; border-color:#C9BCF7; }
- 
-  /* ---------- Game ---------- */
+
+  /* ---- Game ---- */
   #screen-game{ padding-top:14px; gap:12px; max-width:960px; margin:0 auto; width:100%; }
   .game-top{ width:100%; display:flex; align-items:center; gap:14px; }
   .timer-wrap{ flex:1; height:14px; border-radius:999px; background:#EEEEF0; overflow:hidden; }
   .timer-bar{ height:100%; background:var(--brand); border-radius:999px; transition: width 1s linear, background .3s; }
   .round-tag{ font-size:13px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
   .word-tag{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:20px; letter-spacing:4px; white-space:nowrap; }
- 
+
   .score-strip{ display:flex; gap:8px; flex-wrap:wrap; width:100%; }
   .score-chip{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--card-border); font-size:13px; font-weight:600; }
   .score-chip.me{ border-color: var(--brand); }
   .score-chip .dot{ width:9px; height:9px; }
- 
+
   .game-body{ display:flex; gap:14px; width:100%; flex:1; }
   .canvas-card{ flex:2; padding:10px; display:flex; flex-direction:column; gap:10px; min-width:0; position:relative; }
   .canvas-wrap{ position:relative; width:100%; }
   #board{ width:100%; aspect-ratio:4/3; display:block; background:#fff; border-radius:12px; border:2px solid var(--card-border); touch-action:none; cursor:crosshair; }
   .reactions-layer{ position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:12px; }
+  .blindfold{
+    position:absolute; inset:0; pointer-events:none; border-radius:12px; z-index:5;
+    background:repeating-linear-gradient(45deg,#EDE8FF,#EDE8FF 18px,#E3DBFB 18px,#E3DBFB 36px);
+    display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px;
+    font-family:'Fredoka',sans-serif; font-weight:700; font-size:20px; color:#5B4BA8; text-align:center; padding:20px;
+  }
+  .blindfold.show{ display:flex; }
+  .blindfold .bf-emoji{ font-size:52px; }
+  .blindfold .bf-sub{ font-family:'Inter',sans-serif; font-weight:500; font-size:13px; color:#7A6DC2; }
   .reaction-float{ position:absolute; bottom:36px; font-size:30px; animation: floatUp 1.7s ease-out forwards; filter:drop-shadow(0 2px 3px rgba(0,0,0,.15)); }
   @keyframes floatUp{ 0%{ transform:translateY(0) scale(.5); opacity:0;} 12%{ opacity:1; transform:translateY(-6px) scale(1);} 100%{ transform:translateY(-170px) scale(1.15); opacity:0;} }
   .tools{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -205,7 +216,7 @@
   .size-dot{ border-radius:50%; background:var(--ink); cursor:pointer; opacity:.35; }
   .size-dot.active{ opacity:1; }
   .tools .spacer{ flex:1; }
- 
+
   .side-card{ flex:1; min-width:230px; max-width:300px; padding:14px; display:flex; flex-direction:column; gap:10px; }
   .feed{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; max-height:360px; padding-right:2px; }
   .feed-msg{ font-size:13.5px; padding:8px 10px; border-radius:10px; background:#F7F3E8; line-height:1.4; }
@@ -216,16 +227,14 @@
   .reaction-bar{ display:none; gap:6px; justify-content:center; flex-wrap:wrap; }
   .reaction-btn{ border:1.5px solid var(--card-border); background:#fff; border-radius:10px; padding:6px 10px; font-size:16px; line-height:1; }
   .reaction-btn:hover{ border-color:var(--brand); background:#EAFBF9; }
- 
-  .word-modal{
-    position:fixed; inset:0; background:rgba(35,43,61,0.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
-  }
+
+  .word-modal{ position:fixed; inset:0; background:rgba(35,43,61,0.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .word-modal.active{ display:flex; }
   .word-modal-card{ background:#fff; border-radius:20px; padding:26px; max-width:380px; width:100%; text-align:center; box-shadow:var(--shadow-lg); }
   .word-choice{ display:block; width:100%; margin-top:10px; padding:14px; border-radius:14px; border:2px solid var(--card-border); background:#FBF5E8; font-family:'Fredoka',sans-serif; font-weight:600; font-size:17px; }
   .word-choice:hover{ border-color:var(--brand); background:#EAFBF9; }
- 
-  /* ---------- Round/Game end ---------- */
+
+  /* ---- Course ends ---- */
   #screen-roundend, #screen-gameend{ justify-content:flex-start; padding-top:8vh; gap:16px; }
   .end-card{ width:100%; max-width:420px; padding:26px; display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; }
   .scoreboard{ width:100%; display:flex; flex-direction:column; gap:8px; }
@@ -234,29 +243,112 @@
   .scoreboard .medal{ width:22px; text-align:center; }
   .scoreboard .sname{ flex:1; font-weight:600; }
   .scoreboard .spts{ font-weight:700; color:var(--ink-soft); }
- 
+
   .replay-wrap{ width:100%; }
   .replay-wrap canvas{ width:100%; aspect-ratio:4/3; display:block; background:#fff; border-radius:12px; border:2px solid var(--card-border); }
   .replay-label{ font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:2px 0 6px; }
- 
+
   .top-bar{ position:fixed; top:14px; left:14px; display:flex; gap:8px; z-index:10; }
   .icon-btn{ width:38px; height:38px; border-radius:12px; background:#fff; border:1.5px solid var(--card-border); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:var(--shadow); }
- 
+
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:12px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition: all .25s ease; z-index:80; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
- 
+
+  /* ================= MINİ OYUN EKRANI ================= */
+  #screen-minigame{ padding-top:14px; gap:12px; max-width:860px; margin:0 auto; width:100%; flex:1; }
+  .mini-top{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .mini-title{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:22px; display:flex; align-items:center; gap:8px; }
+  .mini-meta{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+  .mini-standings{ display:flex; gap:8px; flex-wrap:wrap; width:100%; }
+  .mini-arena{ width:100%; flex:1; display:flex; flex-direction:column; min-height:380px; }
+  .mini-card-inner{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; width:100%; }
+
+  /* Refleks Düellosu */
+  .reflex-pad{
+    flex:1; min-height:340px; border-radius:18px; border:3px solid var(--card-border);
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; text-align:center;
+    user-select:none; transition: background .12s; cursor:pointer; padding:20px;
+  }
+  .reflex-pad.wait{ background:repeating-linear-gradient(45deg,#FFE3E3,#FFE3E3 22px,#FFD0D0 22px,#FFD0D0 44px); border-color:var(--danger); }
+  .reflex-pad.go{ background:repeating-linear-gradient(45deg,#DFF6EA,#DFF6EA 22px,#C7F0D6 22px,#C7F0D6 44px); border-color:#38C172; }
+  .reflex-pad.idle{ background:#EEEEF0; }
+  .reflex-pad.reveal{ background:#FFF8DE; border-color:var(--mustard); }
+  .reflex-pad.dq{ background:#F2F2F5; opacity:.6; }
+  .reflex-pad .rp-big{ font-family:'Fredoka',sans-serif; font-weight:700; font-size:34px; }
+  .reflex-pad .rp-sub{ font-size:14px; color:var(--ink-soft); }
+  .reflex-pad .rp-rank{ font-size:40px; }
+  .reflex-myline{ font-size:13px; font-weight:600; color:var(--ink-soft); text-align:center; }
+
+  /* Hedef Avı */
+  .target-field{
+    flex:1; position:relative; min-height:360px; border-radius:18px; border:3px solid var(--card-border);
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px) 0 0/28px 100%,
+      #fff; overflow:hidden; touch-action:none;
+  }
+  .target-dot{
+    position:absolute; width:54px; height:54px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #FFE9A8, #FFC145 60%, #E89B1F);
+    border:3px solid #fff; box-shadow:0 0 0 2px #E89B1F, 0 4px 10px rgba(0,0,0,.2);
+    transform:translate(-50%,-50%); cursor:pointer; animation: popIn .18s ease;
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+  }
+  @keyframes popIn{ from{ transform:translate(-50%,-50%) scale(.3); opacity:0;} to{ transform:translate(-50%,-50%) scale(1); opacity:1;} }
+  .target-dot.claimed{ animation: claimBurst .35s ease forwards; }
+  @keyframes claimBurst{ to{ transform:translate(-50%,-50%) scale(1.6); opacity:0; } }
+  .target-spark{ position:absolute; width:10px; height:10px; border-radius:50%; transform:translate(-50%,-50%); pointer-events:none; }
+
+  /* Hızlı Bilgi */
+  .trivia-q{ font-family:'Fredoka',sans-serif; font-size:22px; text-align:center; margin:0 0 14px; line-height:1.3; }
+  .trivia-opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
+  .trivia-opt{
+    border:2px solid var(--card-border); background:#fff; border-radius:14px; padding:16px 12px; text-align:left;
+    font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; transition:border-color .15s, background .15s, transform .1s;
+  }
+  .trivia-opt:hover:not(:disabled){ border-color:var(--brand); background:#EAFBF9; }
+  .trivia-opt:disabled{ cursor:default; }
+  .trivia-opt .to-key{ width:26px; height:26px; border-radius:8px; background:#F2EEE0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
+  .trivia-opt.picked{ border-color:var(--sky); background:#EAF2FF; }
+  .trivia-opt.correct{ border-color:#38C172; background:#DFF6EA; }
+  .trivia-opt.wrong{ border-color:var(--danger); background:#FFE3E3; }
+  .trivia-status{ text-align:center; font-size:13px; color:var(--ink-soft); margin-top:12px; min-height:18px; }
+  .trivia-reveal-row{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; font-size:13px; }
+
+  /* Kelime Zinciri */
+  .chain-list{ display:flex; flex-wrap:wrap; gap:6px; max-height:120px; overflow-y:auto; padding:6px 0; width:100%; }
+  .chain-word{ padding:6px 12px; border-radius:999px; background:#F2EEE0; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; }
+  .chain-word.seed{ background:#EDE8FF; }
+  .chainletter-badge{ align-self:center; display:inline-flex; align-items:center; gap:8px; background:#FFF8DE; border:1.5px solid #E8CE7B; border-radius:14px; padding:8px 16px; font-weight:700; }
+  .chainletter-badge .clb-letter{ font-family:'Fredoka',sans-serif; font-size:28px; color:var(--coral); text-transform:uppercase; }
+  .turn-card{ display:flex; flex-direction:column; gap:10px; }
+  .turn-player{ display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:16px; }
+  .turn-bar{ height:10px; border-radius:999px; background:#EEEEF0; overflow:hidden; width:100%; }
+  .turn-bar > div{ height:100%; background:var(--coral); border-radius:999px; transition:width .1s linear; }
+  .chain-input-row{ display:flex; gap:8px; }
+  .alive-pips{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .alive-pip{ display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; background:#fff; border:1.5px solid var(--card-border); font-size:12px; font-weight:600; }
+  .alive-pip.dead{ opacity:.4; text-decoration:line-through; }
+  .alive-pip.me{ border-color:var(--brand); }
+
+  /* Genel mini son */
+  .mini-end{ display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; width:100%; max-width:460px; margin:0 auto; padding-top:4vh; }
+  .mini-ended-actions{ display:flex; gap:10px; width:100%; }
+
   @media (max-width:720px){
     .game-body{ flex-direction:column; }
     .side-card{ max-width:none; }
     .feed{ max-height:180px; }
+    .mini-grid{ grid-template-columns:1fr; }
+    .trivia-opts{ grid-template-columns:1fr; }
   }
 </style>
 </head>
 <body>
- 
+
 <div class="toast" id="toast"></div>
- 
-<!-- ============ KURULUM UYARISI ============ -->
+
+<!-- ==== KURULUM UYARISI ==== -->
 <section class="screen" id="screen-setup">
   <div class="logo-wrap">
     <svg viewBox="0 0 220 70"><path class="logo-path" d="M10 55 Q 40 10 70 45 T 130 40 Q 150 15 170 45 T 210 30"/></svg>
@@ -273,8 +365,8 @@
     Bunu bir kere yaptıktan sonra siteyi kim açarsa açsın oda kodu ile birlikte oynayabilir.
   </div>
 </section>
- 
-<!-- ============ ANA EKRAN ============ -->
+
+<!-- ==== ANA EKRAN ==== -->
 <section class="screen" id="screen-landing">
   <div class="logo-wrap">
     <svg viewBox="0 0 220 70">
@@ -282,79 +374,89 @@
       <path class="logo-underline" d="M10 58 Q 100 68 200 55"/>
     </svg>
   </div>
-  <p class="tagline">3–5 kişilik canlı çiz-bil partisi. Oda aç, kodu paylaş, çizmeye başla.</p>
- 
+  <p class="tagline">3–5 kişilik canlı çiz-bil partisi + kapışmalık mini oyunlar. Oda aç, kodu paylaş, başla.</p>
+
   <div class="card landing-card">
     <div class="name-row">
       <label for="input-name">Adın</label>
       <input id="input-name" class="field" maxlength="14" placeholder="Rumuzun ne olsun?">
     </div>
- 
+
     <button class="btn btn-primary" id="btn-create-room" style="width:100%;">🎨 Yeni Oda Kur</button>
- 
+
     <div class="divider">veya bir odaya katıl</div>
- 
+
     <div class="join-row">
       <input id="input-code" class="field code-field" maxlength="4" placeholder="KOD">
       <button class="btn btn-primary" id="btn-join-room">Katıl</button>
     </div>
   </div>
 </section>
- 
-<!-- ============ LOBBY ============ -->
+
+<!-- ==== LOBBY ==== -->
 <section class="screen" id="screen-lobby">
   <div class="room-sticker" id="room-code-sticker" title="Kopyalamak için tıkla">
     <span class="label">Oda Kodu · Kopyala</span>
     <span class="code" id="lobby-code">----</span>
     <span class="hint">Arkadaşların bu kodu girip katılabilir</span>
   </div>
- 
+
   <div class="card lobby-card">
     <h3 style="margin:0 0 2px;">Oyuncular <span id="lobby-count" style="color:var(--ink-soft); font-weight:500; font-size:14px;"></span></h3>
     <div class="player-list" id="lobby-players"></div>
- 
-    <div class="mode-select" id="mode-select">
-      <span class="mode-title">Oyun Modu</span>
+
+    <!-- Çiz & Bil modu -->
+    <div class="group-select" id="mode-select">
+      <span class="group-title">🎨 Çiz & Bil Modu</span>
       <div class="mode-options">
         <button class="mode-opt active" data-mode="normal"><span class="mode-emoji">🎨</span>Normal Mod</button>
         <button class="mode-opt" data-mode="blind"><span class="mode-emoji">🙈</span>Kör Çizer Modu</button>
       </div>
       <p class="mode-desc" id="mode-desc">Çizen kişi kelimeyi görür ve çizer, diğerleri tahmin eder.</p>
     </div>
- 
-    <div class="cap-select" id="cap-select">
-      <span class="cap-title">Oda Kapasitesi <span id="cap-current" style="color:var(--ink);"></span></span>
-      <div class="cap-options" id="cap-options"></div>
+
+    <!-- Mini Oyunlar -->
+    <div class="group-select" id="mini-select">
+      <span class="group-title">🎮 Mini Oyunlar (2–10 kişi kapışma)</span>
+      <div class="mini-grid" id="mini-grid"></div>
     </div>
- 
-    <div class="cat-select" id="cat-select">
-      <span class="cat-title">Kelime Kategorileri</span>
-      <div class="cat-options" id="cat-options"></div>
+
+    <div class="group-select dim" id="cap-select">
+      <span class="group-title">Oda Kapasitesi <span id="cap-current" style="color:var(--ink);"></span></span>
+      <div class="options-wrap" id="cap-options"></div>
     </div>
- 
+
+    <div class="group-select dim" id="cat-select">
+      <span class="group-title">Kelime Kategorileri <span style="color:var(--ink-soft); font-weight:500; font-size:11px;">(sadece çiz & bil)</span></span>
+      <div class="options-wrap" id="cat-options"></div>
+    </div>
+
     <p class="lobby-note" id="lobby-note">En az 3 oyuncu bekleniyor…</p>
     <button class="btn btn-primary" id="btn-start-game" style="width:100%;" disabled>Oyunu Başlat</button>
     <button class="btn btn-ghost" id="btn-leave-lobby" style="width:100%;">Odadan Ayrıl</button>
   </div>
 </section>
- 
-<!-- ============ OYUN EKRANI ============ -->
+
+<!-- ==== OYUN EKRANI (ÇİZ & BİL) ==== -->
 <section class="screen" id="screen-game">
   <div class="game-top">
     <span class="round-tag" id="round-tag">Tur 1/6</span>
     <div class="timer-wrap"><div class="timer-bar" id="timer-bar" style="width:100%;"></div></div>
     <span class="word-tag" id="word-tag">_ _ _ _</span>
   </div>
- 
   <span class="mode-badge" id="mode-badge"></span>
- 
   <div class="score-strip" id="score-strip"></div>
- 
+
   <div class="game-body">
     <div class="card canvas-card">
       <div class="canvas-wrap">
         <canvas id="board"></canvas>
         <div class="reactions-layer" id="reactions-layer"></div>
+        <div class="blindfold" id="blindfold">
+          <span class="bf-emoji">🙈</span>
+          <span id="bf-title">Kör çiziyorsun!</span>
+          <span class="bf-sub">Çizgilerin diğer oyunculara görünüyor ama sana görünmüyor. Sohbetteki ipuçlarını dinle ve kelimeyi tahmin et!</span>
+        </div>
       </div>
       <div class="tools" id="tools">
         <div class="swatch active" data-color="#232B3D" style="background:#232B3D;"></div>
@@ -373,7 +475,7 @@
         <button class="btn btn-ghost" id="btn-clear" style="padding:8px 14px; font-size:13px;">🧹 Temizle</button>
       </div>
     </div>
- 
+
     <div class="card side-card">
       <div class="feed" id="feed"></div>
       <div class="reaction-bar" id="reaction-bar">
@@ -390,8 +492,8 @@
     </div>
   </div>
 </section>
- 
-<!-- ============ TUR SONU ============ -->
+
+<!-- ==== TUR SONU (ÇİZ & BİL) ==== -->
 <section class="screen" id="screen-roundend">
   <div class="card end-card">
     <h2 style="margin:0;">Tur bitti!</h2>
@@ -405,8 +507,8 @@
     <p class="lobby-note" id="roundend-next">Sıradaki çizer için hazırlanıyor…</p>
   </div>
 </section>
- 
-<!-- ============ OYUN SONU ============ -->
+
+<!-- ==== OYUN SONU (ÇİZ & BİL) ==== -->
 <section class="screen" id="screen-gameend">
   <div class="card end-card">
     <h2 style="margin:0;">🎉 Oyun Bitti!</h2>
@@ -415,8 +517,18 @@
     <button class="btn btn-ghost" id="btn-back-home" style="width:100%;">Ana Sayfaya Dön</button>
   </div>
 </section>
- 
-<!-- ============ KELİME SEÇİM MODALI ============ -->
+
+<!-- ==== MİNİ OYUN EKRANI ==== -->
+<section class="screen" id="screen-minigame">
+  <div class="mini-top">
+    <span class="mini-title" id="mini-title">🎮 Mini Oyun</span>
+    <span class="mini-meta" id="mini-meta"></span>
+  </div>
+  <div class="mini-standings" id="mini-standings"></div>
+  <div class="mini-arena" id="mini-arena"></div>
+</section>
+
+<!-- ==== KELİME SEÇİM MODALI ==== -->
 <div class="word-modal" id="word-modal">
   <div class="word-modal-card">
     <h3 style="margin:0 0 4px;">Sıra sende, çizecek kelimeni seç!</h3>
@@ -426,18 +538,17 @@
     <button class="word-choice" id="choice-2"></button>
   </div>
 </div>
- 
+
 <div class="top-bar" id="top-bar" style="display:none;">
   <div class="icon-btn home-btn" id="btn-home" title="Ana menüye dön">🏠</div>
   <div class="icon-btn" id="btn-copy-code" title="Oda kodunu kopyala">🔗</div>
   <div class="icon-btn" id="btn-sound" title="Sesi aç/kapat">🔊</div>
 </div>
- 
+
 <script>
-/* ======================================================================
+/* ====
    FIREBASE AYARI — kendi ücretsiz Firebase projenin bilgilerini buraya yapıştır.
-   console.firebase.google.com > Proje Ayarları > Web Uygulaması Ekle
-====================================================================== */
+==== */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD2l-yW7XlrfjY67zllOkrrSPDyAeoo4zw",
   authDomain: "ciz-bil-oyunu.firebaseapp.com",
@@ -447,8 +558,8 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "283583521162",
   appId: "1:283583521162:web:4d50431b176aa0a5c6e873"
 };
-/* ====================================================================== */
- 
+/* ==== */
+
 const WORD_CATEGORIES = {
   genel: ["Kedi","Köpek","Uçak","Araba","Güneş","Ay","Yıldız","Deniz","Balık","Kuş",
   "Ağaç","Çiçek","Ev","Kale","Gemi","Roket","Robot","Piyano","Gitar","Pizza",
@@ -458,7 +569,7 @@ const WORD_CATEGORIES = {
   "Volkan","Gökkuşağı","Kar","Yağmur","Şimşek","Ejderha","Hayalet","Örümcek","Arı","Kelebek",
   "Fil","Zürafa","Aslan","Penguen","Timsah","Tavşan","Ayı","Kaplumbağa","Yılan","Baykuş",
   "Cüzdan","Çanta","Kalem","Makas","Defter","Kitap","Ampul","Sandalye","Masa","Dolap",
-  "Cetvel","Fırça","Ayna","Terazi","Anahtarlık","Bavul","Harita","Pusula","Fener","Kutu",
+  "Cetvel","Fırça","Ayna","Terazi","Bavul","Harita","Pusula","Fener","Kutu",
   "Doktor","Öğretmen","Polis","İtfaiyeci","Aşçı","Berber","Terzi","Ressam","Mühendis","Pilot",
   "Futbol","Basketbol","Yüzme","Koşu","Tenis","Voleybol","Boks","Güreş","Kayak","Satranç",
   "Mutluluk","Üzüntü","Korku","Şaşkınlık","Öfke","Aşk","Rüya","Uyku","Gülmek","Ağlamak",
@@ -467,19 +578,19 @@ const WORD_CATEGORIES = {
   "Makarna","Çorba","Tavuk","Simit","Baklava","Lahmacun","Döner","Çay","Bal","Limon",
   "Buzdolabı","Fırın","Çamaşır Makinesi","Süpürge","Yatak","Yastık","Perde","Halı","Lamba","Vantilatör",
   "Otobüs","Metro","Vapur","Helikopter","Kaykay","Paten","Asansör","Taksi","Kamyon","İtfaiye Aracı",
-  "Okul","Sınıf","Tahta","Sırt Çantası","Silgi","Cetvel Takımı","Sıra","Zil","Teneffüs","Karne",
+  "Okul","Sınıf","Tahta","Sırt Çantası","Silgi","Sıra","Zil","Teneffüs","Karne",
   "Göz","Kulak","Burun","El","Ayak","Kalp","Diş","Saç","Kaş","Parmak",
   "Davul","Keman","Flüt","Nota","Mikrofon","Kulaklık","Orkestra","Şarkı","Dans","Konser",
   "Gezegen","Uydu","Astronot","Galaksi","Teleskop","Kuyruklu Yıldız","Meteor","Evren","Dünya","Mars",
-  "İnternet","Yazılım","Drone","Oyun Konsolu","Ekran","Klavye","Şarj Aleti","Baskı Makinesi","Yapay Zeka","Kablo",
-  "Terlik","Pijama","Diş Fırçası","Sabun","Havlu","Şampuan","Ayna","Musluk","Duş","Küvet"],
+  "İnternet","Yazılım","Drone","Oyun Konsolu","Ekran","Klavye","Şarj Aleti","Yapay Zeka","Kablo",
+  "Terlik","Pijama","Diş Fırçası","Sabun","Havlu","Şampuan","Musluk","Duş","Küvet"],
   unlular: ["Tarkan","Sezen Aksu","Barış Manço","Cem Yılmaz","Kemal Sunal","Hadise","Mustafa Sandal","Ajda Pekkan","Müslüm Gürses","Zeki Müren",
   "Cristiano Ronaldo","Lionel Messi","Michael Jackson","Albert Einstein","Leonardo da Vinci","Charlie Chaplin","Elvis Presley","Freddie Mercury","Marilyn Monroe","Walt Disney",
   "Steve Jobs","Bill Gates","Elon Musk","Taylor Swift","Beyoncé","Lady Gaga","Justin Bieber","Rihanna","Shakira","Will Smith",
   "Johnny Depp","Leonardo DiCaprio","Angelina Jolie","Brad Pitt","Tom Cruise","Nikola Tesla","Pablo Picasso","Vincent van Gogh","Mozart","Beethoven",
   "Usain Bolt","Michael Jordan","Muhammad Ali","Serena Williams","Bruce Lee","Sherlock Holmes","Süpermen","Batman","Örümcek Adam","Harry Potter"]
 };
- 
+
 const PLAYER_COLORS = ["#FF6B6B","#2EC4B6","#FFC145","#9B87F5","#4C9AFF","#38C172","#F783AC","#FF922B","#5C7CFA","#20C997"];
 const ROUNDS_PER_PLAYER = 2;
 const DRAW_SECONDS = 75;
@@ -487,9 +598,52 @@ const MIN_PLAYERS = 3;
 const DEFAULT_MAX_PLAYERS = 6;
 const HARD_MAX_PLAYERS = 10;
 const CAP_OPTIONS = [3,4,5,6,7,8,9,10];
-const WORD_PICK_SECONDS = 12; // kelime seçilmezse otomatik seçim süresi
- 
-/* Odanın seçili kategorilerine göre aktif kelime havuzunu döndürür */
+const WORD_PICK_SECONDS = 12;
+const MINIGAME_MIN_PLAYERS = 2; // mini oyunlar 2 kişiden başlar
+
+/* Mini oyun tanımları */
+const MINI_GAMES = [
+  { id:'reflex', emoji:'⚡', name:'Refleks Düellosu', desc:'Yeşili görünce ilk basan puan alır. Turlu turnuva.' },
+  { id:'target', emoji:'🎯', name:'Hedef Avı',       desc:'60 sn hedeflere tıkla, en çok yakalayan kazanır.' },
+  { id:'trivia', emoji:'🧠', name:'Hızlı Bilgi',     desc:'İlk doğru cevap en çok puan kazananır.' },
+  { id:'chain',  emoji:'🔗', name:'Kelime Zinciri',  desc:'Son harfle kelime yaz, zamanında kal. Son ayakta kalan kazanır.' }
+];
+
+/* Bilgi bankası — cevap metni doğru seçenekle birebir eşleşir (host yerelinde tutulur) */
+const TRIVIA_BANK = [
+  { q:"Türkiye'nin başkenti neresi?", options:["Ankara","İstanbul","İzmir","Bursa"], correct:"Ankara" },
+  { q:"Suyun kimyasal formülü nedir?", options:["H₂O","CO₂","O₂","NaCl"], correct:"H₂O" },
+  { q:"Türkiye kaç ilden oluşur?", options:["81","79","83","80"], correct:"81" },
+  { q:"Güneş Sistemi'nde kaç gezegen vardır?", options:["8","9","7","10"], correct:"8" },
+  { q:"Cumhuriyet hangi yıl ilan edildi?", options:["1923","1920","1925","1938"], correct:"1923" },
+  { q:"Türkiye'nin en yüksek dağı hangisidir?", options:["Ağrı Dağı","Uludağ","Erciyes","Süphan"], correct:"Ağrı Dağı" },
+  { q:"Şapka İnkılabı hangi yılda yapıldı?", options:["1925","1923","1928","1934"], correct:"1925" },
+  { q:"'İstiklal Marşı'nın şairi kimdir?", options:["Mehmet Akif Ersoy","Ziya Gökalp","Tevfik Fikret","Yunus Emre"], correct:"Mehmet Akif Ersoy" },
+  { q:"İstanbul Boğazı hangi iki denizi birleştirir?", options:["Karadeniz-Marmara","Ege-Karadeniz","Akdeniz-Marmara","Karadeniz-Ege"], correct:"Karadeniz-Marmara" },
+  { q:"Türkiye'nin en uzun nehri hangisidir?", options:["Kızılırmak","Fırat","Sakarya","Dicle"], correct:"Kızılırmak" },
+  { q:"Türkiye'nin en büyük gölü hangisidir?", options:["Van Gölü","Tuz Gölü","Beyşehir Gölü","İznik Gölü"], correct:"Van Gölü" },
+  { q:"Ulusal Egemenlik ve Çocuk Bayramı ne zaman?", options:["23 Nisan","19 Mayıs","29 Ekim","30 Ağustos"], correct:"23 Nisan" },
+  { q:"Dünyanın en büyük okyanusu hangisidir?", options:["Büyük Okyanus","Atlas Okyanusu","Hint Okyanusu","Arktik Okyanus"], correct:"Büyük Okyanus" },
+  { q:"Telefonu icat ettiği kabul edilen kimdir?", options:["Graham Bell","Edison","Tesla","Newton"], correct:"Graham Bell" },
+  { q:"Dünyanın yüzölçümü en küçük ülkesi hangisidir?", options:["Vatikan","Monaco","Malta","San Marino"], correct:"Vatikan" },
+  { q:"Mozart hangi ülkenin bestecisidir?", options:["Avusturya","Almanya","İtalya","Fransa"], correct:"Avusturya" },
+  { q:"Yetişkin insan vücudunda kaç kemik bulunur?", options:["206","201","212","195"], correct:"206" },
+  { q:"Olimpiyat Oyunları kaç yılda bir yapılır?", options:["4","2","5","10"], correct:"4" },
+  { q:"Türk Lirası'nın simgesi nedir?", options:["₺","$","€","£"], correct:"₺" },
+  { q:"Dünyanın en yüksek dağı hangisidir?", options:["Everest","K2","Aconcagua","Mont Blanc"], correct:"Everest" },
+  { q:"Güneş Sistemi'nin merkezindeki yıldız hangisidir?", options:["Güneş","Ay","Dünya","Jüpiter"], correct:"Güneş" },
+  { q:"Zeytin ağacı hangi iklim kuşağında yetişir?", options:["Akdeniz","Karasal","Tundra","Ekvatoral"], correct:"Akdeniz" },
+  { q:"Albert Einstein hangi alanda tanınır?", options:["Fizik","Kimya","Biyoloji","Tarih"], correct:"Fizik" },
+  { q:"Türkiye'nin en kalabalık ili hangisidir?", options:["İstanbul","Ankara","İzmir","Bursa"], correct:"İstanbul" },
+  { q:"'Kitap' kelimesi Türkçeye hangi dilden geçmiştir?", options:["Arapça","Farsça","Fransızca","Latince"], correct:"Arapça" },
+  { q:"Yazıyı bulan ilk uygarlık hangisidir?", options:["Sümerler","Mısırlılar","Hititler","Çinliler"], correct:"Sümerler" },
+  { q:"Satranç oyununda toplam kaç taş vardır?", options:["32","16","64","24"], correct:"32" },
+  { q:"Bir yılda yaklaşık kaç hafta vardır?", options:["52","48","50","54"], correct:"52" },
+  { q:"19 Mayıs'ta kutlanan bayrak hangisidir?", options:["Atatürk'ü Anma, Gençlik ve Spor Bayramı","Ulusal Egemenlik Bayramı","Cumhuriyet Bayramı","Zafer Bayramı"], correct:"Atatürk'ü Anma, Gençlik ve Spor Bayramı" },
+  { q:"Uluslararası futbol sahasında bir takımda sahada kaç kişi olur?", options:["11","10","9","12"], correct:"11" }
+];
+
+/* Odanın çiz-bil kelime havuzu */
 function getWordPool(state){
   const cats = (state && state.categories) || { genel: true };
   let pool = [];
@@ -498,7 +652,7 @@ function getWordPool(state){
   if(pool.length === 0) pool = WORD_CATEGORIES.genel;
   return pool;
 }
- 
+
 let db, roomRef, strokesRef, guessesRef, reactionsRef;
 let myId = localStorage.getItem('cb_myId') || ('p_' + Math.random().toString(36).slice(2,10));
 localStorage.setItem('cb_myId', myId);
@@ -513,19 +667,18 @@ let drawing = false;
 let currentColor = "#232B3D";
 let currentSize = 6;
 let hasGuessedThisRound = false;
-let localStrokes = [];   // { key, strokeKey, p1, p2, color, size } — tuvali yeniden çizmek için önbellek
-let strokeHistory = [];  // { strokeKey, keys:[] } — "geri al" için kendi çizgilerimiz
+let localStrokes = [];
+let strokeHistory = [];
 let guessCache = [];
 let soundOn = localStorage.getItem('cb_sound') !== 'off';
- 
-/* ---------- ekran yönetimi ---------- */
+let wasMini = false; // mini oyun ekranından çıkışta temizlik için
+
+/* ---- ekran yönetimi ---- */
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('top-bar').style.display = (id==='screen-lobby'||id==='screen-game'||id==='screen-roundend'||id==='screen-gameend') ? 'flex' : 'none';
+  document.getElementById('top-bar').style.display = (id==='screen-lobby'||id==='screen-game'||id==='screen-roundend'||id==='screen-gameend'||id==='screen-minigame') ? 'flex' : 'none';
   if(id === 'screen-game'){
-    // Ekran DOM'da "display:none"dan "flex"e geçtiği an tuval boyutu 0x0 olur.
-    // Yerleşim (layout) oturana kadar bekleyip tuvali doğru boyuta göre yeniden kur.
     requestAnimationFrame(() => requestAnimationFrame(resizeCanvasToDisplaySize));
   }
 }
@@ -536,27 +689,22 @@ function toast(msg){
   clearTimeout(t.__hideTimer);
   t.__hideTimer = setTimeout(()=>t.classList.remove('show'), 2200);
 }
- 
-/* ---------- ses efektleri (harici dosya yok, WebAudio ile üretiliyor) ---------- */
+
+/* ---- ses efektleri ---- */
 let audioCtx = null;
 function ensureAudio(){
-  if(!audioCtx){
-    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
-  }
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; } }
   return audioCtx;
 }
 function playSound(kind){
   if(!soundOn) return;
-  const ac = ensureAudio();
-  if(!ac) return;
+  const ac = ensureAudio(); if(!ac) return;
   if(ac.state === 'suspended') ac.resume();
   const now = ac.currentTime;
   const mk = (freq, type, start, dur, peak) => {
-    const osc = ac.createOscillator();
-    const gain = ac.createGain();
+    const osc = ac.createOscillator(); const gain = ac.createGain();
     osc.connect(gain); gain.connect(ac.destination);
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, now+start);
+    osc.type = type; osc.frequency.setValueAtTime(freq, now+start);
     gain.gain.setValueAtTime(0.0001, now+start);
     gain.gain.exponentialRampToValueAtTime(peak, now+start+0.02);
     gain.gain.exponentialRampToValueAtTime(0.0001, now+start+dur);
@@ -568,35 +716,37 @@ function playSound(kind){
   else if(kind === 'tick'){ mk(1000,'square',0,0.05,0.08); }
   else if(kind === 'clear'){ mk(300,'sine',0,0.1,0.1); }
   else if(kind === 'start'){ mk(520,'sine',0,0.12,0.14); mk(760,'sine',0.1,0.16,0.14); }
+  else if(kind === 'go'){ mk(720,'square',0,0.18,0.2); }
+  else if(kind === 'hit'){ mk(950,'triangle',0,0.1,0.16); }
+  else if(kind === 'ding'){ mk(1320,'triangle',0,0.25,0.18); }
 }
- 
-/* ---------- başlangıç ---------- */
+
 window.addEventListener('DOMContentLoaded', () => {
   if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.databaseURL){
-    showScreen('screen-setup');
-    return;
+    showScreen('screen-setup'); return;
   }
+  // Korumalı kurulum uyarısı ekranı için fazladan metin — conf doldurulduğunda zaten gösterilmez
   firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
   showScreen('screen-landing');
- 
+
   document.getElementById('btn-sound').textContent = soundOn ? '🔊' : '🔇';
- 
+
   const savedName = localStorage.getItem('cb_myName');
   if(savedName) document.getElementById('input-name').value = savedName;
- 
+
   document.getElementById('btn-create-room').onclick = createRoom;
   document.getElementById('btn-join-room').onclick = joinRoom;
   document.getElementById('input-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
   document.getElementById('input-code').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
   document.getElementById('input-name').addEventListener('keydown', e => { if(e.key==='Enter') createRoom(); });
- 
+
   document.getElementById('room-code-sticker').onclick = copyCode;
   document.getElementById('btn-copy-code').onclick = copyCode;
   document.getElementById('btn-start-game').onclick = startGame;
   document.getElementById('btn-leave-lobby').onclick = leaveRoom;
   document.getElementById('btn-home').onclick = () => {
-    if(roomState && (roomState.status === 'drawing' || roomState.status === 'choosing')){
+    if(roomState && (roomState.status === 'drawing' || roomState.status === 'choosing' || roomState.status === 'minigame')){
       if(!confirm('Oyundan çıkıp ana menüye dönmek istediğine emin misin?')) return;
     }
     leaveRoom();
@@ -604,44 +754,41 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-play-again').onclick = playAgain;
   document.getElementById('btn-back-home').onclick = () => { leaveRoom(); };
   document.getElementById('btn-replay-again').onclick = () => playReplay(roomState ? (roomState.turnIndex||0) : 0);
- 
+
   document.getElementById('btn-clear').onclick = clearCanvas;
   document.getElementById('btn-undo').onclick = undoLastStroke;
   document.getElementById('btn-guess').onclick = sendGuess;
   document.getElementById('input-guess').addEventListener('keydown', e => { if(e.key==='Enter') sendGuess(); });
- 
+
   document.getElementById('btn-sound').onclick = () => {
     soundOn = !soundOn;
     localStorage.setItem('cb_sound', soundOn ? 'on' : 'off');
     document.getElementById('btn-sound').textContent = soundOn ? '🔊' : '🔇';
     if(soundOn) playSound('tick');
   };
- 
+
   document.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => sendReaction(btn.dataset.emoji));
- 
+
   document.querySelectorAll('.mode-opt').forEach(opt => opt.onclick = () => {
-    if(!isHost || !roomRef) return;               // sadece oda sahibi modu değiştirebilir
+    if(!isHost || !roomRef) return;
     setGameMode(opt.dataset.mode);
   });
- 
+
   document.querySelectorAll('.swatch').forEach(sw => sw.onclick = () => {
     document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
-    sw.classList.add('active');
-    currentColor = sw.dataset.color;
+    sw.classList.add('active'); currentColor = sw.dataset.color;
   });
   document.querySelectorAll('.size-dot').forEach(sd => sd.onclick = () => {
     document.querySelectorAll('.size-dot').forEach(s=>s.classList.remove('active'));
-    sd.classList.add('active');
-    currentSize = parseInt(sd.dataset.size);
+    sd.classList.add('active'); currentSize = parseInt(sd.dataset.size);
   });
- 
+
   setupCanvas();
- 
-  // Sayfa yenilendiğinde aynı odaya otomatik geri dön (bağlantı koptuğunda oyundan atılmayı önler)
+
   const savedRoom = localStorage.getItem('cb_roomCode');
   if(savedRoom) attemptRejoin(savedRoom);
 });
- 
+
 function getName(){
   const n = document.getElementById('input-name').value.trim() || 'Oyuncu';
   localStorage.setItem('cb_myName', n);
@@ -649,15 +796,16 @@ function getName(){
 }
 function randomCode(){
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c = '';
-  for(let i=0;i<4;i++) c += chars[Math.floor(Math.random()*chars.length)];
+  let c = ''; for(let i=0;i<4;i++) c += chars[Math.floor(Math.random()*chars.length)];
   return c;
 }
 function copyCode(){
   navigator.clipboard?.writeText(roomCode).then(()=>toast('Oda kodu kopyalandı: ' + roomCode)).catch(()=>toast('Kod: ' + roomCode));
 }
- 
-/* ---------- oda oluştur / katıl / yeniden bağlan ---------- */
+function escapeHtml(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function normalize(str){ return (str||'').toLocaleLowerCase('tr-TR').trim().replace(/\s+/g,' '); }
+
+/* ---- oda oluştur / katıl / yeniden bağlan ---- */
 function createRoom(){
   myName = getName();
   roomCode = randomCode();
@@ -668,14 +816,16 @@ function createRoom(){
   ref.set({
     status: 'lobby',
     hostId: myId,
+    gameType: 'drawing', // 'drawing' | 'minigame'
     gameMode: 'normal',
+    miniGame: null,
     maxPlayers: DEFAULT_MAX_PLAYERS,
     categories: { genel: true, unlular: false },
     players: playerObj,
     createdAt: Date.now()
   }).then(() => enterRoom(roomCode)).catch(err => toast('Hata: ' + err.message));
 }
- 
+
 function joinRoom(){
   myName = getName();
   const code = document.getElementById('input-code').value.trim().toUpperCase();
@@ -692,12 +842,10 @@ function joinRoom(){
       const usedColors = Object.values(players).map(p=>p.color);
       const color = PLAYER_COLORS.find(c => !usedColors.includes(c)) || PLAYER_COLORS[0];
       ref.child('players/' + myId).set({ name: myName, color, score: 0, joinedAt: Date.now(), connected: true }).then(proceed);
-    } else {
-      proceed();
-    }
+    } else { proceed(); }
   }).catch(err => toast('Hata: ' + err.message));
 }
- 
+
 function attemptRejoin(code){
   if(!db) return;
   db.ref('rooms/' + code).get().then(snap => {
@@ -711,12 +859,10 @@ function attemptRejoin(code){
       roomCode = code;
       enterRoom(code);
       toast('Odana geri döndün');
-    } else {
-      localStorage.removeItem('cb_roomCode');
-    }
+    } else { localStorage.removeItem('cb_roomCode'); }
   }).catch(()=>{});
 }
- 
+
 function enterRoom(code){
   roomCode = code;
   roomRef = db.ref('rooms/' + code);
@@ -727,14 +873,14 @@ function enterRoom(code){
   showScreen('screen-lobby');
   roomRef.on('value', onRoomUpdate);
 }
- 
+
 function leaveRoom(){
   const code = roomCode;
+  cleanupMiniGame();
   if(roomRef){
     roomRef.child('players/' + myId).onDisconnect().cancel();
     roomRef.child('players/' + myId).remove();
     roomRef.off('value', onRoomUpdate);
-    // Oda boş kaldıysa arkada bıraktığı verileri temizle (yığılan hayalet odaları önler)
     db.ref('rooms/' + code + '/players').get().then(snap => {
       const remaining = snap.val() || {};
       if(Object.keys(remaining).length === 0){
@@ -749,39 +895,41 @@ function leaveRoom(){
   clearHostTimer();
   clearInterval(window.__timerInterval);
   localStorage.removeItem('cb_roomCode');
-  roomRef = null; roomCode = ''; isHost = false; roomState = null; lastRenderedTurn = -1;
- 
-  // Yeni bir odaya temiz bir şekilde girebilmek için önceki oyunun kalıntılarını temizle
+  roomRef = null; roomCode = ''; isHost = false; roomState = null; lastRenderedTurn = -1; wasMini = false;
+
   closeWordModal();
   document.getElementById('feed').innerHTML = '';
   document.getElementById('score-strip').innerHTML = '';
   document.getElementById('reactions-layer').innerHTML = '';
   document.getElementById('input-guess').value = '';
   document.getElementById('input-code').value = '';
+  document.getElementById('mini-arena').innerHTML = '';
   guessCache = [];
   hasGuessedThisRound = false;
   localStrokes = [];
   strokeHistory = [];
   resetCanvasVisual();
- 
   showScreen('screen-landing');
 }
- 
-/* ---------- oda durumu dinleme ---------- */
+
+/* ---- oda durumu dinleme ---- */
 function onRoomUpdate(snap){
   const data = snap.val();
   if(!data){ toast('Oda kapatıldı'); localStorage.removeItem('cb_roomCode'); showScreen('screen-landing'); return; }
   roomState = data;
   isHost = (data.hostId === myId);
- 
+
   const players = data.players || {};
   const count = Object.keys(players).length;
- 
-  // Oda sahibi ayrıldıysa veya bağlantısı koptuysa, en eski katılan oyuncu otomatik devralır
+
   if(count > 0 && (!players[data.hostId] || players[data.hostId].connected === false)){
     maybeClaimHost(players, data.hostId);
   }
- 
+
+  // mini oyun ekranından çıkışta temizlik
+  const isMini = data.status === 'minigame';
+  if(!isMini && wasMini){ cleanupMiniGame(); wasMini = false; }
+
   if(data.status === 'lobby' || !data.status){
     clearInterval(window.__timerInterval);
     renderLobby(players, count);
@@ -799,9 +947,14 @@ function onRoomUpdate(snap){
     clearInterval(window.__timerInterval);
     renderGameEnd(players);
     showScreen('screen-gameend');
+  } else if(data.status === 'minigame'){
+    wasMini = true;
+    renderMiniGame(data, players);
+    showScreen('screen-minigame');
+    if(isHost) hostMiniGameLogic(data);
   }
 }
- 
+
 function maybeClaimHost(players, currentHostId){
   const connectedIds = Object.keys(players).filter(id => players[id].connected !== false);
   if(connectedIds.length === 0) return;
@@ -810,8 +963,8 @@ function maybeClaimHost(players, currentHostId){
     roomRef.child('hostId').transaction(cur => (cur === currentHostId ? myId : cur));
   }
 }
- 
-/* ---------- lobby ---------- */
+
+/* ---- lobby ---- */
 function renderLobby(players, count){
   const cap = roomState.maxPlayers || DEFAULT_MAX_PLAYERS;
   document.getElementById('lobby-count').textContent = '(' + count + '/' + cap + ')';
@@ -821,26 +974,86 @@ function renderLobby(players, count){
     const online = p.connected !== false;
     const chip = document.createElement('div');
     chip.className = 'player-chip' + (online ? '' : ' offline');
-    chip.innerHTML = `<span class="status-dot ${online?'online':''}"></span><span class="dot" style="background:${p.color}"></span><span class="pname">${escapeHtml(p.name)}${id===myId?' (sen)':''}${online?'':' · bağlantı koptu'}</span>${id===roomState.hostId?'<span class="crown">👑</span>':''}`;
+    chip.innerHTML = `<span class="status-dot ${online?'online':'off'}"></span><span class="dot" style="background:${p.color}"></span><span class="pname">${escapeHtml(p.name)}${id===myId?' (sen)':''}${online?'':' · bağlantı koptu'}</span>${id===roomState.hostId?'<span class="crown">👑</span>':''}`;
     list.appendChild(chip);
   });
   const connectedCount = Object.values(players).filter(p => p.connected !== false).length;
   const startBtn = document.getElementById('btn-start-game');
   const note = document.getElementById('lobby-note');
-  if(connectedCount < MIN_PLAYERS){
-    note.textContent = `En az ${MIN_PLAYERS} oyuncu bekleniyor… (${connectedCount}/${MIN_PLAYERS})`;
+
+  const gameType = roomState.gameType || 'drawing';
+  const minNeeded = gameType === 'minigame' ? MINIGAME_MIN_PLAYERS : MIN_PLAYERS;
+  const miniName = (MINI_GAMES.find(m=>m.id===roomState.miniGame)||{}).name;
+  startBtn.textContent = gameType === 'minigame'
+      ? ('🎮 ' + (miniName || 'Mini Oyun') + ' — Başlat')
+      : '🎨 Oyunu Başlat';
+
+  if(connectedCount < minNeeded){
+    note.textContent = gameType === 'minigame'
+      ? `En az ${minNeeded} oyuncu gerekli (${connectedCount}/${minNeeded})`
+      : `En az ${MIN_PLAYERS} oyuncu bekleniyor… (${connectedCount}/${MIN_PLAYERS})`;
     startBtn.disabled = true;
   } else {
     note.textContent = isHost ? 'Herkes hazır! Başlatabilirsin.' : 'Oda sahibinin başlatması bekleniyor…';
     startBtn.disabled = !isHost;
   }
   startBtn.style.display = isHost ? 'inline-flex' : 'none';
+
   renderModeSelect();
+  renderMiniSelect();
   renderCapacitySelect(connectedCount);
   renderCategorySelect();
+
+  // mini oyun seçiliyse kapasite & kategori loş
+  const drawing = gameType === 'drawing';
+  document.getElementById('cap-select').classList.toggle('dim', !drawing);
+  document.getElementById('cat-select').classList.toggle('dim', !drawing);
+  document.getElementById('mode-select').classList.toggle('dim', !drawing);
 }
- 
-/* ---- oda kapasitesi seçimi (lobby) ---- */
+
+function renderModeSelect(){
+  const gameType = roomState.gameType || 'drawing';
+  const mode = (roomState && roomState.gameMode) || 'normal';
+  document.querySelectorAll('.mode-opt').forEach(opt => {
+    const isActive = gameType === 'drawing' && opt.dataset.mode === mode;
+    opt.classList.toggle('active', isActive);
+    opt.disabled = !isHost;
+    opt.classList.toggle('locked', !isHost && !isActive);
+  });
+  const desc = document.getElementById('mode-desc');
+  if(desc) desc.textContent = MODE_DESCS[mode] || MODE_DESCS.normal;
+}
+const MODE_DESCS = {
+  normal: 'Çizen kişi kelimeyi görür ve çizer, diğerleri tahmin eder.',
+  blind:  'Çizen kelimeyi GÖRMEZ! Diğerleri kelimeyi görür ve ipuçlarıyla çizeni yönlendirir.'
+};
+function setGameMode(mode){
+  if(!isHost || !roomRef) return;
+  roomRef.update({ gameType:'drawing', gameMode: mode, miniGame: null });
+  playSound('tick');
+}
+
+/* ---- mini oyun seçimi (lobby) ---- */
+function renderMiniSelect(){
+  const gameType = roomState.gameType || 'drawing';
+  const current = roomState.miniGame;
+  const grid = document.getElementById('mini-grid');
+  grid.innerHTML = '';
+  MINI_GAMES.forEach(m => {
+    const card = document.createElement('button');
+    card.className = 'mini-card' + (gameType === 'minigame' && current === m.id ? ' active' : '') + (!isHost ? ' locked' : '');
+    card.disabled = !isHost;
+    card.innerHTML = `<span class="mc-emoji">${m.emoji}</span><span class="mc-name">${m.name}</span><span class="mc-desc">${m.desc}</span>`;
+    card.onclick = () => { if(isHost) selectMiniGame(m.id); };
+    grid.appendChild(card);
+  });
+}
+function selectMiniGame(id){
+  if(!isHost || !roomRef) return;
+  roomRef.update({ gameType:'minigame', miniGame: id });
+  playSound('tick');
+}
+
 function renderCapacitySelect(connectedCount){
   const cap = roomState.maxPlayers || DEFAULT_MAX_PLAYERS;
   document.getElementById('cap-current').textContent = '· ' + cap + ' kişi';
@@ -848,7 +1061,7 @@ function renderCapacitySelect(connectedCount){
   wrap.innerHTML = '';
   CAP_OPTIONS.forEach(n => {
     const btn = document.createElement('button');
-    btn.className = 'cap-opt' + (n === cap ? ' active' : '') + (!isHost && n !== cap ? ' locked' : '');
+    btn.className = 'opt-chip' + (n === cap ? ' active' : '') + (!isHost && n !== cap ? ' locked' : '');
     btn.textContent = n;
     btn.disabled = !isHost;
     btn.onclick = () => setMaxPlayers(n, connectedCount);
@@ -858,12 +1071,11 @@ function renderCapacitySelect(connectedCount){
 function setMaxPlayers(n, connectedCount){
   if(!isHost || !roomRef) return;
   if(n < MIN_PLAYERS || n > HARD_MAX_PLAYERS) return;
-  if(n < connectedCount){ toast('Odada zaten ' + connectedCount + ' kişi var, daha düşük ayarlanamaz'); return; }
+  if(n < connectedCount){ toast('Odada zaten ' + connectedCount + ' kişi var'); return; }
   roomRef.child('maxPlayers').set(n);
   playSound('tick');
 }
- 
-/* ---- kelime kategorisi seçimi (lobby) ---- */
+
 const CATEGORY_LABELS = { genel: '🔤 Genel Kelimeler', unlular: '🌟 Ünlüler' };
 function renderCategorySelect(){
   const cats = roomState.categories || { genel: true, unlular: false };
@@ -872,7 +1084,7 @@ function renderCategorySelect(){
   Object.keys(CATEGORY_LABELS).forEach(key => {
     const active = cats[key] !== false && (key !== 'genel' ? !!cats[key] : cats.genel !== false);
     const btn = document.createElement('button');
-    btn.className = 'cat-opt' + (active ? ' active' : '') + (!isHost ? ' locked' : '');
+    btn.className = 'opt-pill' + (active ? ' active' : '') + (!isHost ? ' locked' : '');
     btn.textContent = CATEGORY_LABELS[key];
     btn.disabled = !isHost;
     btn.onclick = () => toggleCategory(key, cats);
@@ -883,95 +1095,53 @@ function toggleCategory(key, cats){
   if(!isHost || !roomRef) return;
   const current = cats[key] !== false;
   const next = { ...cats, [key]: !current };
-  // en az bir kategori açık kalmalı
   const activeCount = Object.keys(CATEGORY_LABELS).filter(k => k === 'genel' ? next.genel !== false : !!next[k]).length;
   if(activeCount === 0){ toast('En az bir kategori seçili olmalı'); return; }
   roomRef.child('categories').set(next);
   playSound('tick');
 }
- 
-/* ---- oyun modu seçimi (lobby) ---- */
-const MODE_DESCS = {
-  normal: 'Çizen kişi kelimeyi görür ve çizer, diğerleri tahmin eder.',
-  blind:  'Çizen kelimeyi GÖRMEZ! Diğerleri kelimeyi görür ve sözlü ipuçlarıyla çizeni yönlendirir.'
-};
-function renderModeSelect(){
-  const mode = (roomState && roomState.gameMode) || 'normal';
-  document.querySelectorAll('.mode-opt').forEach(opt => {
-    const isActive = opt.dataset.mode === mode;
-    opt.classList.toggle('active', isActive);
-    // Sadece oda sahibi değiştirebilir; diğer oyuncular seçili modu görür ama tıklayamaz
-    opt.disabled = !isHost;
-    opt.classList.toggle('locked', !isHost && !isActive);
-  });
-  const desc = document.getElementById('mode-desc');
-  if(desc) desc.textContent = MODE_DESCS[mode] || MODE_DESCS.normal;
-}
-function setGameMode(mode){
-  if(!isHost || !roomRef) return;
-  if(mode !== 'normal' && mode !== 'blind') return;
-  roomRef.child('gameMode').set(mode);
-  playSound('tick');
-}
- 
+
 function startGame(){
   if(!isHost || !roomState) return;
   const players = roomState.players || {};
   const ids = Object.keys(players).filter(id => players[id].connected !== false);
-  if(ids.length < MIN_PLAYERS) return;
+  const gameType = roomState.gameType || 'drawing';
+  const minNeeded = gameType === 'minigame' ? MINIGAME_MIN_PLAYERS : MIN_PLAYERS;
+  if(ids.length < minNeeded) return;
+  playSound('start');
+  if(gameType === 'minigame'){ startMiniGame(ids); return; }
   const shuffled = ids.sort(() => Math.random() - 0.5);
   const totalTurns = shuffled.length * ROUNDS_PER_PLAYER;
-  playSound('start');
-  roomRef.update({
-    drawOrder: shuffled,
-    turnIndex: 0,
-    totalTurns,
-    usedWords: [],
-  }).then(() => beginTurn(shuffled[0]));
+  roomRef.update({ drawOrder: shuffled, turnIndex: 0, totalTurns, usedWords: [] }).then(() => beginTurn(shuffled[0]));
 }
- 
-/* ---------- tur başlatma (host) ---------- */
+
+/* ---- tur başlatma (host, çiz & bil) ---- */
 function beginTurn(drawerId){
   const wordPool = getWordPool(roomState);
   const used = roomState.usedWords || [];
   const pool = wordPool.filter(w => !used.includes(w));
   const source = pool.length >= 3 ? pool : wordPool;
   const choices = shuffleSample(source, 3);
-  roomRef.update({
-    status: 'choosing',
-    drawerId,
-    wordChoices: choices,
-    currentWord: null,
-    roundCorrectIds: null,
-    timerEnd: null
-  });
+  roomRef.update({ status: 'choosing', drawerId, wordChoices: choices, currentWord: null, roundCorrectIds: null, timerEnd: null });
 }
- 
 function shuffleSample(arr, n){
   const copy = [...arr];
   for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; }
   return copy.slice(0,n);
 }
- 
-/* ---------- oyun ekranı render ---------- */
+
+/* ---- oyun ekranı render (çiz & bil) ---- */
 function renderGameFrame(data, players){
   const turnIndex = data.turnIndex || 0;
   document.getElementById('round-tag').textContent = `Tur ${turnIndex+1}/${data.totalTurns}`;
   renderScoreStrip(players);
- 
+
   const amDrawer = data.drawerId === myId;
   const blind = data.gameMode === 'blind';
   const wordTag = document.getElementById('word-tag');
- 
-  // Oyun ekranındaki mod rozeti
   const badge = document.getElementById('mode-badge');
-  if(badge){
-    badge.classList.add('show');
-    badge.classList.toggle('blind', blind);
-    badge.textContent = blind ? '🙈 Kör Çizer Modu' : '🎨 Normal Mod';
-  }
- 
-  // Yeni tura geçildiyse tuval ve akışları o tura özel yollara bağla
+  if(badge){ badge.classList.add('show'); badge.classList.toggle('blind', blind); badge.textContent = blind ? '🙈 Kör Çizer Modu' : '🎨 Normal Mod'; }
+
   if(turnIndex !== lastRenderedTurn){
     lastRenderedTurn = turnIndex;
     resetCanvasVisual();
@@ -980,37 +1150,49 @@ function renderGameFrame(data, players){
     attachReactionListener(turnIndex);
     hasGuessedThisRound = false;
     document.getElementById('reaction-bar').style.display = 'none';
+    document.getElementById('blindfold').classList.remove('show');
   }
- 
+
+  const blindfoldEl = document.getElementById('blindfold');
+  const guessInput = document.getElementById('input-guess');
+
   if(data.status === 'choosing'){
-    // Kör çizer modunda çizen kelime seçmez; host otomatik seçer
     wordTag.textContent = blind ? 'Kelime seçiliyor…' : '✏️ seçiyor…';
     document.getElementById('timer-bar').style.width = '100%';
     document.getElementById('timer-bar').style.background = 'var(--brand)';
-    if(amDrawer && !blind){
-      openWordModal(data.wordChoices || []);
-    } else {
-      closeWordModal();
-    }
+    if(amDrawer && !blind){ openWordModal(data.wordChoices || []); } else { closeWordModal(); }
+    blindfoldEl.classList.remove('show');
     setCanvasInteractive(false);
     setGuessInteractive(false);
   } else if(data.status === 'drawing'){
     closeWordModal();
     const word = data.currentWord || '';
     if(blind){
-      // Çizen kelimeyi görmez; tahmin edenler kelimeyi açıkça görür
-      wordTag.textContent = amDrawer ? '🙈 KÖR ÇİZER' : word.toUpperCase();
+      wordTag.textContent = amDrawer ? '🙈 ???' : word.toUpperCase();
+      blindfoldEl.classList.toggle('show', amDrawer);
+      const drawerGuessed = data.roundCorrectIds && data.roundCorrectIds[data.drawerId];
+      if(amDrawer){
+        guessInput.placeholder = 'Ne çizdiğini tahmin et…';
+        setGuessInteractive(!drawerGuessed);
+        if(drawerGuessed) blindfoldEl.classList.remove('show');
+      } else {
+        guessInput.placeholder = 'İpucu yaz (kelimeyi yazma!)…';
+        setGuessInteractive(true);
+      }
+      document.getElementById('reaction-bar').style.display = amDrawer ? 'none' : 'flex';
     } else {
       wordTag.textContent = amDrawer ? word.toUpperCase() : maskWord(word, new Set());
+      blindfoldEl.classList.remove('show');
+      guessInput.placeholder = 'Tahminini yaz…';
+      const alreadyGuessed = amDrawer || (data.roundCorrectIds && data.roundCorrectIds[myId]);
+      setGuessInteractive(!alreadyGuessed);
+      document.getElementById('reaction-bar').style.display = (alreadyGuessed && !amDrawer) ? 'flex' : 'none';
     }
     setCanvasInteractive(amDrawer);
-    const alreadyGuessed = amDrawer || (data.roundCorrectIds && data.roundCorrectIds[myId]);
-    setGuessInteractive(!alreadyGuessed);
-    document.getElementById('reaction-bar').style.display = (alreadyGuessed && !amDrawer) ? 'flex' : 'none';
     updateTimerBar(data.timerEnd, word, amDrawer, blind);
   }
 }
- 
+
 function renderScoreStrip(players){
   const strip = document.getElementById('score-strip');
   strip.innerHTML = '';
@@ -1022,23 +1204,17 @@ function renderScoreStrip(players){
     strip.appendChild(chip);
   });
 }
- 
-/* ---------- kelime maskeleme + ilerleyen ipuçları ---------- */
+
 function maskWord(word, revealSet){
   return word.split('').map((ch,i) => ch===' ' ? '  ' : (revealSet.has(i) ? ch.toUpperCase() : '_')).join(' ');
 }
- 
-// Kelimeye özgü, tüm oyuncularda aynı sonucu üreten (deterministik) bir harf açma sırası
 function hintOrder(word){
-  const idxs = [];
-  for(let i=0;i<word.length;i++){ if(word[i] !== ' ') idxs.push(i); }
-  let seed = 1;
-  for(const ch of word) seed = (seed * 33 + ch.charCodeAt(0)) % 233280;
+  const idxs = []; for(let i=0;i<word.length;i++){ if(word[i] !== ' ') idxs.push(i); }
+  let seed = 1; for(const ch of word) seed = (seed * 33 + ch.charCodeAt(0)) % 233280;
   const rand = () => { seed = (seed*9301 + 49297) % 233280; return seed/233280; };
   for(let i=idxs.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [idxs[i],idxs[j]]=[idxs[j],idxs[i]]; }
   return idxs;
 }
- 
 function getRevealSet(word, timerEnd){
   if(!word) return new Set();
   const total = DRAW_SECONDS*1000;
@@ -1046,40 +1222,23 @@ function getRevealSet(word, timerEnd){
   const frac = Math.min(1, Math.max(0, 1 - remaining/total));
   const letters = word.replace(/ /g,'').length;
   let revealCount = 0;
-  if(letters > 3){
-    if(frac > 0.35) revealCount = 1;
-    if(frac > 0.65) revealCount = 2;
-    if(frac > 0.85 && letters > 6) revealCount = 3;
-  }
+  if(letters > 3){ if(frac > 0.35) revealCount = 1; if(frac > 0.65) revealCount = 2; if(frac > 0.85 && letters > 6) revealCount = 3; }
   return new Set(hintOrder(word).slice(0, revealCount));
 }
- 
-/* ---------- kelime seçimi ---------- */
+
 function openWordModal(choices){
   const modal = document.getElementById('word-modal');
   if(!choices.length){ modal.classList.remove('active'); return; }
   modal.classList.add('active');
-  choices.forEach((w,i) => {
-    const btn = document.getElementById('choice-' + i);
-    btn.textContent = w;
-    btn.onclick = () => pickWord(w);
-  });
+  choices.forEach((w,i) => { const btn = document.getElementById('choice-' + i); btn.textContent = w; btn.onclick = () => pickWord(w); });
 }
 function closeWordModal(){ document.getElementById('word-modal').classList.remove('active'); }
- 
 function pickWord(word){
   closeWordModal();
   const used = roomState.usedWords || [];
-  roomRef.update({
-    status: 'drawing',
-    currentWord: word,
-    usedWords: [...used, word],
-    timerEnd: Date.now() + DRAW_SECONDS * 1000,
-    wordChoices: null
-  });
+  roomRef.update({ status: 'drawing', currentWord: word, usedWords: [...used, word], timerEnd: Date.now() + DRAW_SECONDS * 1000, wordChoices: null });
 }
- 
-/* ---------- zamanlayıcı ---------- */
+
 function updateTimerBar(timerEnd, word, amDrawer, blind){
   if(!timerEnd) return;
   const total = DRAW_SECONDS * 1000;
@@ -1091,7 +1250,6 @@ function updateTimerBar(timerEnd, word, amDrawer, blind){
     bar.style.width = pct + '%';
     bar.style.background = pct < 25 ? 'var(--danger)' : (pct < 55 ? 'var(--mustard)' : 'var(--brand)');
     if(!amDrawer && roomState && roomState.status === 'drawing'){
-      // Kör çizer modunda tahmin edenler kelimeyi tam görür; normal modda kademeli ipucu maskesi
       document.getElementById('word-tag').textContent = blind ? word.toUpperCase() : maskWord(word, getRevealSet(word, timerEnd));
     }
     const sec = Math.ceil(remaining/1000);
@@ -1099,90 +1257,65 @@ function updateTimerBar(timerEnd, word, amDrawer, blind){
   };
   tick();
   clearInterval(window.__timerInterval);
-  window.__timerInterval = setInterval(() => {
-    tick();
-    if(Date.now() >= timerEnd) clearInterval(window.__timerInterval);
-  }, 250);
+  window.__timerInterval = setInterval(() => { tick(); if(Date.now() >= timerEnd) clearInterval(window.__timerInterval); }, 250);
 }
- 
+
 function hostWatchTimer(data){
   clearHostTimer();
   if(data.status === 'choosing'){
     const blind = data.gameMode === 'blind';
-    // Kör çizer modunda çizen kelimeyi seçmez -> host hızlıca rastgele seçer.
-    // Normal modda çizen seçmezse süre dolunca ilk kelime otomatik seçilir.
     const delay = blind ? 1200 : WORD_PICK_SECONDS * 1000;
     hostTimer = setTimeout(() => {
       if(roomState && roomState.status === 'choosing' && roomRef){
         const choices = roomState.wordChoices || [];
         const fallbackPool = getWordPool(roomState);
-        const word = blind
-          ? (choices[Math.floor(Math.random()*choices.length)] || fallbackPool[Math.floor(Math.random()*fallbackPool.length)])
-          : (choices[0] || fallbackPool[Math.floor(Math.random()*fallbackPool.length)]);
+        const word = blind ? (choices[Math.floor(Math.random()*choices.length)] || fallbackPool[Math.floor(Math.random()*fallbackPool.length)]) : (choices[0] || fallbackPool[Math.floor(Math.random()*fallbackPool.length)]);
         const used = roomState.usedWords || [];
-        roomRef.update({
-          status: 'drawing',
-          currentWord: word,
-          usedWords: [...used, word],
-          timerEnd: Date.now() + DRAW_SECONDS * 1000,
-          wordChoices: null
-        });
+        roomRef.update({ status: 'drawing', currentWord: word, usedWords: [...used, word], timerEnd: Date.now() + DRAW_SECONDS * 1000, wordChoices: null });
       }
     }, delay);
     return;
   }
   if(data.status !== 'drawing' || !data.timerEnd) return;
+  if(data.gameMode === 'blind' && data.roundCorrectIds && data.roundCorrectIds[data.drawerId]){
+    hostTimer = setTimeout(() => finishRound(), 900); return;
+  }
   const remaining = data.timerEnd - Date.now();
   if(remaining <= 0){ finishRound(); return; }
   hostTimer = setTimeout(() => { finishRound(); }, remaining + 300);
 }
 function clearHostTimer(){ if(hostTimer){ clearTimeout(hostTimer); hostTimer = null; } }
- 
+
 function finishRound(){
   if(!roomRef || !roomState || roomState.status !== 'drawing') return;
   const players = roomState.players || {};
   const correctIds = Object.keys(roomState.roundCorrectIds || {});
-  const bonus = correctIds.length * 10;
+  const bonus = roomState.gameMode === 'blind' ? 0 : correctIds.length * 10;
   const updates = {};
-  if(bonus > 0 && roomState.drawerId){
-    updates['players/' + roomState.drawerId + '/score'] = (players[roomState.drawerId]?.score || 0) + bonus;
-  }
+  if(bonus > 0 && roomState.drawerId){ updates['players/' + roomState.drawerId + '/score'] = (players[roomState.drawerId]?.score || 0) + bonus; }
   updates['status'] = 'roundend';
   roomRef.update(updates);
 }
- 
 function hostScheduleNextTurn(data){
   clearHostTimer();
   hostTimer = setTimeout(() => {
     const nextIndex = (data.turnIndex||0) + 1;
-    if(nextIndex >= data.totalTurns){
-      roomRef.update({ status: 'gameend' });
-    } else {
-      const drawer = data.drawOrder[nextIndex];
-      roomRef.update({ turnIndex: nextIndex }).then(() => beginTurn(drawer));
-    }
+    if(nextIndex >= data.totalTurns){ roomRef.update({ status: 'gameend' }); }
+    else { const drawer = data.drawOrder[nextIndex]; roomRef.update({ turnIndex: nextIndex }).then(() => beginTurn(drawer)); }
   }, 4500);
 }
- 
-/* ---------- canvas (tuval) ---------- */
+
+/* ---- canvas ---- */
 let canvas, ctx;
 function setupCanvas(){
   canvas = document.getElementById('board');
   ctx = canvas.getContext('2d');
- 
-  // ANA HATA DÜZELTMESİ: tuval, ekranı "display:none" iken 0x0 boyutunda kalıyor
-  // ve hiç yeniden boyutlandırılmıyordu — bu yüzden çizim görünmüyor, hatta konum
-  // hesaplamaları (0'a bölme) NaN üretiyordu. ResizeObserver + ekran geçişinde
-  // tetiklenen resize ile bu artık her durumda düzeltiliyor.
-  if(window.ResizeObserver){
-    new ResizeObserver(() => resizeCanvasToDisplaySize()).observe(canvas);
-  }
+  if(window.ResizeObserver){ new ResizeObserver(() => resizeCanvasToDisplaySize()).observe(canvas); }
   window.addEventListener('resize', resizeCanvasToDisplaySize);
   resizeCanvasToDisplaySize();
- 
+
   let currentStrokeKey = null;
   let lastPoint = null;
- 
   const getPos = (e) => {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -1190,13 +1323,10 @@ function setupCanvas(){
     const w = rect.width || 1, h = rect.height || 1;
     return { x: (clientX - rect.left) / w, y: (clientY - rect.top) / h };
   };
- 
   const start = (e) => {
     if(canvas.dataset.interactive !== 'true') return;
-    e.preventDefault();
-    drawing = true;
-    const pos = getPos(e);
-    lastPoint = pos;
+    e.preventDefault(); drawing = true;
+    const pos = getPos(e); lastPoint = pos;
     currentStrokeKey = 's_' + Date.now() + '_' + Math.floor(Math.random()*9999);
     strokeHistory.push({ strokeKey: currentStrokeKey, keys: [] });
     const key = pushSegment(currentStrokeKey, pos, pos, currentColor, currentSize);
@@ -1204,8 +1334,7 @@ function setupCanvas(){
     drawSegment(pos, pos, currentColor, currentSize);
   };
   const move = (e) => {
-    if(!drawing) return;
-    e.preventDefault();
+    if(!drawing) return; e.preventDefault();
     const pos = getPos(e);
     drawSegment(lastPoint, pos, currentColor, currentSize);
     const key = pushSegment(currentStrokeKey, lastPoint, pos, currentColor, currentSize);
@@ -1213,7 +1342,6 @@ function setupCanvas(){
     lastPoint = pos;
   };
   const end = () => { drawing = false; currentStrokeKey = null; };
- 
   canvas.addEventListener('mousedown', start);
   canvas.addEventListener('mousemove', move);
   window.addEventListener('mouseup', end);
@@ -1222,121 +1350,65 @@ function setupCanvas(){
   canvas.addEventListener('touchend', end);
   canvas.addEventListener('touchcancel', end);
 }
- 
 function resizeCanvasToDisplaySize(){
   if(!canvas) return;
   const rect = canvas.getBoundingClientRect();
-  if(rect.width === 0 || rect.height === 0) return; // henüz görünür değil, sonra tekrar denenecek
+  if(rect.width === 0 || rect.height === 0) return;
   const ratio = window.devicePixelRatio || 1;
-  const newW = Math.round(rect.width * ratio);
-  const newH = Math.round(rect.height * ratio);
+  const newW = Math.round(rect.width * ratio), newH = Math.round(rect.height * ratio);
   if(canvas.width === newW && canvas.height === newH) return;
-  canvas.width = newW;
-  canvas.height = newH;
+  canvas.width = newW; canvas.height = newH;
   ctx.setTransform(ratio,0,0,ratio,0,0);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   redrawFromCache();
 }
- 
 function redrawFromCache(){
   if(!canvas || !ctx) return;
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0,0,rect.width, rect.height);
   localStrokes.forEach(s => drawSegment(s.p1, s.p2, s.color, s.size));
 }
- 
 function setCanvasInteractive(flag){
   canvas.dataset.interactive = flag ? 'true' : 'false';
   canvas.style.cursor = flag ? 'crosshair' : 'default';
   document.getElementById('tools').style.opacity = flag ? '1' : '.4';
   document.getElementById('tools').style.pointerEvents = flag ? 'auto' : 'none';
 }
- 
 function drawSegment(p1, p2, color, size){
   const rect = canvas.getBoundingClientRect();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = size;
-  ctx.beginPath();
-  ctx.moveTo(p1.x * rect.width, p1.y * rect.height);
-  ctx.lineTo(p2.x * rect.width, p2.y * rect.height);
-  ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = size;
+  ctx.beginPath(); ctx.moveTo(p1.x * rect.width, p1.y * rect.height); ctx.lineTo(p2.x * rect.width, p2.y * rect.height); ctx.stroke();
 }
- 
 function pushSegment(strokeKey, p1, p2, color, size){
   if(!strokesRef) return null;
   const ref = strokesRef.push({ strokeKey, p1, p2, color, size, t: Date.now() });
   return ref.key;
 }
- 
 function attachStrokeListener(turnIndex){
   detachStrokeListener();
-  localStrokes = [];
-  strokeHistory = [];
+  localStrokes = []; strokeHistory = [];
   strokesRef = db.ref('strokes/' + roomCode + '/' + turnIndex);
-  const addedHandler = (snap) => {
-    const seg = snap.val();
-    if(!seg) return;
-    localStrokes.push({ key: snap.key, strokeKey: seg.strokeKey, p1: seg.p1, p2: seg.p2, color: seg.color, size: seg.size });
-    drawSegment(seg.p1, seg.p2, seg.color, seg.size);
-  };
-  const removedHandler = (snap) => {
-    localStrokes = localStrokes.filter(s => s.key !== snap.key);
-    redrawFromCache();
-  };
+  const addedHandler = (snap) => { const seg = snap.val(); if(!seg) return; localStrokes.push({ key: snap.key, strokeKey: seg.strokeKey, p1: seg.p1, p2: seg.p2, color: seg.color, size: seg.size }); drawSegment(seg.p1, seg.p2, seg.color, seg.size); };
+  const removedHandler = (snap) => { localStrokes = localStrokes.filter(s => s.key !== snap.key); redrawFromCache(); };
   strokesRef.on('child_added', addedHandler);
   strokesRef.on('child_removed', removedHandler);
   strokeUnsub = () => { strokesRef.off('child_added', addedHandler); strokesRef.off('child_removed', removedHandler); };
 }
 function detachStrokeListener(){ if(strokeUnsub){ strokeUnsub(); strokeUnsub = null; } }
- 
-function resetCanvasVisual(){
-  if(!canvas || !ctx) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.clearRect(0,0,rect.width, rect.height);
-}
- 
-function clearCanvas(){
-  if(canvas.dataset.interactive !== 'true') return;
-  resetCanvasVisual();
-  localStrokes = [];
-  strokeHistory = [];
-  if(strokesRef) strokesRef.remove();
-  playSound('clear');
-}
- 
-function undoLastStroke(){
-  if(canvas.dataset.interactive !== 'true') return;
-  if(strokeHistory.length === 0){ toast('Geri alınacak çizgi yok'); return; }
-  const entry = strokeHistory.pop();
-  entry.keys.forEach(k => { if(k && strokesRef) strokesRef.child(k).remove(); });
-}
- 
-/* ---------- tahmin / sohbet ---------- */
-function setGuessInteractive(flag){
-  document.getElementById('input-guess').disabled = !flag;
-  document.getElementById('btn-guess').disabled = !flag;
-}
- 
-function normalize(str){
-  return (str||'').toLocaleLowerCase('tr-TR').trim().replace(/\s+/g,' ');
-}
- 
-// Basit Levenshtein mesafesi — "çok yaklaştın" ipucu için kullanılır, otomatik doğrulamaz
+function resetCanvasVisual(){ if(!canvas || !ctx) return; const rect = canvas.getBoundingClientRect(); ctx.clearRect(0,0,rect.width, rect.height); }
+function clearCanvas(){ if(canvas.dataset.interactive !== 'true') return; resetCanvasVisual(); localStrokes = []; strokeHistory = []; if(strokesRef) strokesRef.remove(); playSound('clear'); }
+function undoLastStroke(){ if(canvas.dataset.interactive !== 'true') return; if(strokeHistory.length === 0){ toast('Geri alınacak çizgi yok'); return; } const entry = strokeHistory.pop(); entry.keys.forEach(k => { if(k && strokesRef) strokesRef.child(k).remove(); }); }
+
+/* ---- tahmin / sohbet ---- */
+function setGuessInteractive(flag){ document.getElementById('input-guess').disabled = !flag; document.getElementById('btn-guess').disabled = !flag; }
 function levenshtein(a, b){
   const m = a.length, n = b.length;
-  if(m === 0) return n;
-  if(n === 0) return m;
+  if(m === 0) return n; if(n === 0) return m;
   const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
-  for(let i=0;i<=m;i++) dp[i][0] = i;
-  for(let j=0;j<=n;j++) dp[0][j] = j;
-  for(let i=1;i<=m;i++){
-    for(let j=1;j<=n;j++){
-      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
-    }
-  }
+  for(let i=0;i<=m;i++) dp[i][0] = i; for(let j=0;j<=n;j++) dp[0][j] = j;
+  for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]); } }
   return dp[m][n];
 }
- 
 function sendGuess(){
   const input = document.getElementById('input-guess');
   const text = input.value.trim();
@@ -1344,85 +1416,68 @@ function sendGuess(){
   input.value = '';
   const word = roomState.currentWord || '';
   const nText = normalize(text), nWord = normalize(word);
-  const isCorrect = nText === nWord;
+  const blind = roomState.gameMode === 'blind';
+  const amDrawer = roomState.drawerId === myId;
   const players = roomState.players || {};
-  const msg = { name: players[myId]?.name || myName, text, correct: isCorrect, uid: myId, t: Date.now() };
-  if(guessesRef) guessesRef.push(msg);
- 
+  if(blind && !amDrawer){
+    let safeText = text;
+    if(nText.includes(nWord) || levenshtein(nText, nWord) <= 2){ safeText = '🚫 (kelimeyi yazmaya çalıştı!)'; toast('Kelimeyi yazamazsın, ipucu ver!'); playSound('wrong'); }
+    if(guessesRef) guessesRef.push({ name: players[myId]?.name || myName, text: safeText, correct: false, hint: true, uid: myId, t: Date.now() });
+    return;
+  }
+  const isCorrect = nText === nWord;
+  if(guessesRef) guessesRef.push({ name: players[myId]?.name || myName, text, correct: isCorrect, uid: myId, t: Date.now() });
+  if(isCorrect && blind && amDrawer){
+    const remaining = roomState.timerEnd ? Math.max(0, roomState.timerEnd - Date.now()) : 0;
+    const points = 40 + Math.round((remaining/(DRAW_SECONDS*1000)) * 40);
+    const updates = { ['players/' + myId + '/score']: (players[myId]?.score || 0) + points, ['roundCorrectIds/' + myId]: true };
+    Object.keys(players).forEach(id => { if(id !== myId && players[id].connected !== false){ updates['players/' + id + '/score'] = (players[id].score || 0) + 20; } });
+    roomRef.update(updates);
+    setGuessInteractive(false); toast('Doğru bildin! +' + points + ' puan'); playSound('correct');
+    if(isHost) setTimeout(finishRound, 900); return;
+  }
+  if(blind && amDrawer && !isCorrect){ playSound('wrong'); if(nWord && nText.length >= 2 && levenshtein(nText, nWord) <= 2){ toast('🔥 Çok yaklaştın!'); } return; }
   if(isCorrect){
     const remaining = roomState.timerEnd ? Math.max(0, roomState.timerEnd - Date.now()) : 0;
     const points = 30 + Math.round((remaining/(DRAW_SECONDS*1000)) * 40);
-    const myScore = players[myId]?.score || 0;
-    roomRef.update({
-      ['players/' + myId + '/score']: myScore + points,
-      ['roundCorrectIds/' + myId]: true
-    });
-    setGuessInteractive(false);
-    hasGuessedThisRound = true;
+    roomRef.update({ ['players/' + myId + '/score']: (players[myId]?.score || 0) + points, ['roundCorrectIds/' + myId]: true });
+    setGuessInteractive(false); hasGuessedThisRound = true;
     document.getElementById('reaction-bar').style.display = 'flex';
-    toast('Doğru bildin! +' + points + ' puan');
-    playSound('correct');
- 
-    // herkes bildiyse turu erken bitir (host tarafında, bağlantısı kopanlar sayılmaz)
+    toast('Doğru bildin! +' + points + ' puan'); playSound('correct');
     if(isHost){
       const guessers = Object.keys(players).filter(id => id !== roomState.drawerId && players[id].connected !== false);
       const correctSoFar = Object.keys(roomState.roundCorrectIds || {});
-      if(correctSoFar.length + 1 >= guessers.length){
-        setTimeout(finishRound, 900);
-      }
+      if(correctSoFar.length + 1 >= guessers.length){ setTimeout(finishRound, 900); }
     }
   } else {
     playSound('wrong');
-    if(nWord && nText.length >= 2){
-      const dist = levenshtein(nText, nWord);
-      if(dist > 0 && dist <= 2 && Math.abs(nText.length - nWord.length) <= 2){
-        toast('🔥 Çok yaklaştın!');
-      }
-    }
+    if(nWord && nText.length >= 2){ const dist = levenshtein(nText, nWord); if(dist > 0 && dist <= 2 && Math.abs(nText.length - nWord.length) <= 2){ toast('🔥 Çok yaklaştın!'); } }
   }
 }
- 
 function attachGuessListener(turnIndex){
-  detachGuessListener();
-  guessCache = [];
-  document.getElementById('feed').innerHTML = '';
+  detachGuessListener(); guessCache = []; document.getElementById('feed').innerHTML = '';
   guessesRef = db.ref('guesses/' + roomCode + '/' + turnIndex);
-  const handler = (snap) => {
-    const g = snap.val();
-    if(!g) return;
-    guessCache.push(g);
-    renderGuessFeed();
-  };
+  const handler = (snap) => { const g = snap.val(); if(!g) return; guessCache.push(g); renderGuessFeed(); };
   guessesRef.on('child_added', handler);
   guessUnsub = () => guessesRef.off('child_added', handler);
 }
 function detachGuessListener(){ if(guessUnsub){ guessUnsub(); guessUnsub = null; } }
- 
 function renderGuessFeed(){
   const feed = document.getElementById('feed');
   const list = [...guessCache].sort((a,b) => a.t - b.t);
   feed.innerHTML = '';
-  if(list.length === 0){
-    const empty = document.createElement('div');
-    empty.className = 'feed-msg system';
-    empty.textContent = 'Tahminler burada görünecek…';
-    feed.appendChild(empty);
-  }
+  if(list.length === 0){ const empty = document.createElement('div'); empty.className = 'feed-msg system'; empty.textContent = 'Tahminler burada görünecek…'; feed.appendChild(empty); }
   list.forEach(g => {
     const div = document.createElement('div');
-    if(g.correct){
-      div.className = 'feed-msg correct';
-      div.textContent = `✓ ${g.name} doğru bildi!`;
-    } else {
-      div.className = 'feed-msg';
-      div.textContent = `${g.name}: ${g.text}`;
-    }
+    if(g.correct){ div.className = 'feed-msg correct'; div.textContent = `✓ ${g.name} doğru bildi!`; }
+    else if(g.hint){ div.className = 'feed-msg'; div.style.background = '#EDE8FF'; div.textContent = `💡 ${g.name}: ${g.text}`; }
+    else { div.className = 'feed-msg'; div.textContent = `${g.name}: ${g.text}`; }
     feed.appendChild(div);
   });
   feed.scrollTop = feed.scrollHeight;
 }
- 
-/* ---------- emoji tepkileri ---------- */
+
+/* ---- emoji tepkileri ---- */
 function attachReactionListener(turnIndex){
   detachReactionListener();
   reactionsRef = db.ref('reactions/' + roomCode + '/' + turnIndex);
@@ -1431,24 +1486,15 @@ function attachReactionListener(turnIndex){
   reactionUnsub = () => reactionsRef.off('child_added', handler);
 }
 function detachReactionListener(){ if(reactionUnsub){ reactionUnsub(); reactionUnsub = null; } }
- 
-function sendReaction(emoji){
-  if(!reactionsRef) return;
-  reactionsRef.push({ emoji, uid: myId, t: Date.now() });
-}
- 
+function sendReaction(emoji){ if(!reactionsRef) return; reactionsRef.push({ emoji, uid: myId, t: Date.now() }); }
 function spawnReactionFloat(emoji){
-  const layer = document.getElementById('reactions-layer');
-  if(!layer) return;
-  const el = document.createElement('div');
-  el.className = 'reaction-float';
-  el.textContent = emoji;
+  const layer = document.getElementById('reactions-layer'); if(!layer) return;
+  const el = document.createElement('div'); el.className = 'reaction-float'; el.textContent = emoji;
   el.style.left = (8 + Math.random()*76) + '%';
-  layer.appendChild(el);
-  setTimeout(() => el.remove(), 1800);
+  layer.appendChild(el); setTimeout(() => el.remove(), 1800);
 }
- 
-/* ---------- tur sonu / oyun sonu ---------- */
+
+/* ---- tur sonu / oyun sonu (çiz & bil) ---- */
 function renderRoundEnd(data, players){
   document.getElementById('roundend-word').textContent = data.currentWord ? `Kelime: "${data.currentWord}"` : '';
   renderScoreboard('roundend-scores', players);
@@ -1456,14 +1502,9 @@ function renderRoundEnd(data, players){
   document.getElementById('roundend-next').textContent = nextIndex >= data.totalTurns ? 'Sonuçlar hesaplanıyor…' : 'Sıradaki çizer hazırlanıyor…';
   playReplay(data.turnIndex || 0);
 }
- 
-function renderGameEnd(players){
-  renderScoreboard('gameend-scores', players);
-}
- 
+function renderGameEnd(players){ renderScoreboard('gameend-scores', players); }
 function renderScoreboard(containerId, players){
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
+  const el = document.getElementById(containerId); el.innerHTML = '';
   const sorted = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
   const medals = ['🥇','🥈','🥉'];
   sorted.forEach(([id,p], i) => {
@@ -1473,64 +1514,775 @@ function renderScoreboard(containerId, players){
     el.appendChild(row);
   });
 }
- 
-/* ---------- çizim tekrarı (replay) ---------- */
 function playReplay(turnIndex){
   const replayCanvas = document.getElementById('replay-canvas');
   if(!replayCanvas || !roomCode) return;
   const rrect = replayCanvas.getBoundingClientRect();
   if(rrect.width === 0){ return; }
   const ratio = window.devicePixelRatio || 1;
-  replayCanvas.width = Math.round(rrect.width * ratio);
-  replayCanvas.height = Math.round(rrect.height * ratio);
+  replayCanvas.width = Math.round(rrect.width * ratio); replayCanvas.height = Math.round(rrect.height * ratio);
   const rctx = replayCanvas.getContext('2d');
   rctx.setTransform(ratio,0,0,ratio,0,0);
-  rctx.clearRect(0,0,rrect.width, rrect.height);
-  rctx.lineCap = 'round'; rctx.lineJoin = 'round';
- 
+  rctx.clearRect(0,0,rrect.width, rrect.height); rctx.lineCap = 'round'; rctx.lineJoin = 'round';
   db.ref('strokes/' + roomCode + '/' + turnIndex).once('value').then(snap => {
-    const val = snap.val();
-    if(!val) return;
+    const val = snap.val(); if(!val) return;
     const segs = Object.values(val).sort((a,b) => (a.t||0) - (b.t||0));
     if(segs.length === 0) return;
-    const perFrame = Math.max(1, Math.ceil(segs.length / 90)); // ~1.5 saniyede tamamlanacak şekilde hızlandır
+    const perFrame = Math.max(1, Math.ceil(segs.length / 90));
     let i = 0;
     const step = () => {
       for(let k=0; k<perFrame && i<segs.length; k++, i++){
         const s = segs[i];
         rctx.strokeStyle = s.color; rctx.lineWidth = s.size;
-        rctx.beginPath();
-        rctx.moveTo(s.p1.x * rrect.width, s.p1.y * rrect.height);
-        rctx.lineTo(s.p2.x * rrect.width, s.p2.y * rrect.height);
-        rctx.stroke();
+        rctx.beginPath(); rctx.moveTo(s.p1.x * rrect.width, s.p1.y * rrect.height); rctx.lineTo(s.p2.x * rrect.width, s.p2.y * rrect.height); rctx.stroke();
       }
       if(i < segs.length) requestAnimationFrame(step);
     };
     step();
   }).catch(()=>{});
 }
- 
 function playAgain(){
   if(!isHost || !roomRef) return;
   const players = roomState.players || {};
   const resets = {};
   Object.keys(players).forEach(id => resets['players/' + id + '/score'] = 0);
   roomRef.update(resets).then(() => {
-    roomRef.update({ status: 'lobby', drawOrder: null, turnIndex: null, totalTurns: null, usedWords: null, drawerId: null, currentWord: null, roundCorrectIds: null, timerEnd: null, wordChoices: null });
+    roomRef.update({ status: 'lobby', drawOrder: null, turnIndex: null, totalTurns: null, usedWords: null, drawerId: null, currentWord: null, roundCorrectIds: null, timerEnd: null, wordChoices: null, miniGameState: null });
     db.ref('strokes/' + roomCode).remove();
     db.ref('guesses/' + roomCode).remove();
     db.ref('reactions/' + roomCode).remove();
     lastRenderedTurn = -1;
   });
 }
- 
-function escapeHtml(s){
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
+
+/* =========================================================================
+   MİNİ OYUNLAR
+   ========================================================================= */
+
+let miniSpawnTimer = null;
+let miniEvalTimer = null;
+let miniTargetTimers = [];
+let miniDataRef = null;
+let miniUnsubs = [];
+let miniListenersOn = false;        // dinleyiciler bir kez kurulur (oyun başına)
+let reflexGoSeenAt = null;
+let reflexHasTapped = false;         // her tur tek dokunuş
+let reflexMyLine = null;             // bu turdaki sonucum
+let triviaMyAnswer = null;           // mevcut sorudaki cevabım (index)
+let triviaRevealPlayed = -1;         // reveal sesinin tekrarını önler
+let chainInputReady = false;
+let triviaQuestions = [];            // host yerelinde: doğruları saklar
+
+function cleanupMiniGame(){
+  if(miniSpawnTimer){ clearInterval(miniSpawnTimer); miniSpawnTimer = null; }
+  if(miniEvalTimer){ clearTimeout(miniEvalTimer); miniEvalTimer = null; }
+  miniTargetTimers.forEach(t => clearTimeout(t)); miniTargetTimers = [];
+  miniUnsubs.forEach(fn => { try{ fn(); }catch(e){} }); miniUnsubs = [];
+  miniListenersOn = false;
+  targetSeenIds = new Set(); targetLoopOn = false;
+  reflexGoSeenAt = null; reflexHasTapped = false; reflexMyLine = null;
+  triviaMyAnswer = null; triviaRevealPlayed = -1; chainInputReady = false;
 }
+
+function miniData(){ return db.ref('rooms/' + roomCode + '/minigameData'); }
+
+function attachedPlayers(){
+  return Object.entries(roomState.players||{}).filter(([_,p]) => p.connected !== false);
+}
+
+/* ---- host: başlat ---- */
+function startMiniGame(ids){
+  const game = roomState.miniGame;
+  const startScores = {};
+  ids.forEach(id => startScores[id] = 0);
+  cleanupMiniGame();
+  miniDataRef = miniData();
+  // her oyunda anahtar alt veriyi temiz başlat
+  if(ids.length === Object.keys(roomState.players||{}).length){
+    db.ref('rooms/' + roomCode + '/minigameData').remove();
+  }
+  roomRef.update({ status:'minigame', miniGameState: { type:game, phase:'setup', scores:startScores } }).then(() => {
+    if(game === 'reflex') launchReflex(ids, 7);
+    else if(game === 'target') launchTarget(ids, 60);
+    else if(game === 'trivia') launchTrivia(ids, Math.min(10, TRIVIA_BANK.length));
+    else if(game === 'chain') launchWordchain(ids);
+  });
+}
+
+/* ---------- ⚡ REFLEKS DÜELLOSU ---------- */
+function launchReflex(ids, totalRounds){
+  const st = roomRef.child('miniGameState');
+  st.set({ type:'reflex', phase:'wait', round:1, totalRounds, scores:zeroScores(ids) });
+  reflexNewRound(1, ids, totalRounds);
+}
+function reflexNewRound(round, ids, totalRounds){
+  const delay = 1500 + Math.random()*3500;
+  miniEvalTimer = setTimeout(() => {
+    if(!roomRef || !isHost) return;
+    const scores = currentMiniScores();
+    roomRef.child('miniGameState').update({ phase:'go', goTime:Date.now() });
+    miniEvalTimer = setTimeout(() => reflexEvaluate(round, ids, totalRounds), 2600);
+  }, delay);
+}
+function reflexEvaluate(round, ids, totalRounds){
+  if(!roomRef || !isHost) return;
+  db.ref('rooms/' + roomCode + '/minigameData/taps/' + round).get().then(snap => {
+    const taps = snap.val() || {};
+    const valid = [], dq = [];
+    ids.forEach(id => { const t = taps[id]; if(!t) return; if(t.falseStart){ dq.push(id); } else { valid.push({ id, rt: t.reactTime || 999999 }); } });
+    valid.sort((a,b) => a.rt - b.rt);
+    let winnerId = null, winnerPts = 0;
+    const scores = currentMiniScores();
+    if(valid.length > 0){
+      winnerId = valid[0].id;
+      winnerPts = 40 + Math.max(0, Math.round((800 - valid[0].rt)/8)); // 40 + refleks hızı avantajı
+      scores[winnerId] = (scores[winnerId]||0) + winnerPts;
+      // 2. ve 3.'ye küçük puan
+      if(valid[1]){ scores[valid[1].id] = (scores[valid[1].id]||0) + 15; }
+      if(valid[2]){ scores[valid[2].id] = (scores[valid[2].id]||0) + 5; }
+    }
+    const results = {};
+    ids.forEach(id => { const t = taps[id]; results[id] = t ? {rt: t.reactTime, falseStart: !!t.falseStart} : {none:true}; });
+    roomRef.child('miniGameState').update({ phase:'roundend', round, scores, roundResults: results, roundWinner: winnerId });
+    miniEvalTimer = setTimeout(() => reflexAdvance(round, ids, totalRounds), 2800);
+  });
+}
+function reflexAdvance(round, ids, totalRounds){
+  if(!roomRef || !isHost) return;
+  if(round >= totalRounds){ roomRef.child('miniGameState').update({ phase:'gameend' }); return; }
+  clearTaps(round);
+  roomRef.child('miniGameState').update({ phase:'wait', round: round+1, goTime:null, roundResults:null, roundWinner:null });
+  reflexNewRound(round+1, ids, totalRounds);
+}
+function clearTaps(round){ db.ref('rooms/' + roomCode + '/minigameData/taps/' + round).remove(); }
+
+/* ---------- 🎯 HEDEF AVI ---------- */
+function launchTarget(ids, seconds){
+  const endTime = Date.now() + seconds*1000;
+  roomRef.child('miniGameState').update({ phase:'playing', endTime, scores:zeroScores(ids), hits:{} });
+  miniSpawnTimer = setInterval(() => {
+    if(!roomRef || !isHost || Date.now() > endTime){
+      if(miniSpawnTimer){ clearInterval(miniSpawnTimer); miniSpawnTimer = null; }
+      return;
+    }
+    spawnTarget();
+  }, 620);
+}
+function spawnTarget(){
+  const ref = miniDataRef.child('targets').push({ x: 8 + Math.random()*84, y: 8 + Math.random()*84, born: Date.now(), claimedBy: null });
+  const key = ref.key;
+  const tmr = setTimeout(() => { if(key && minisDataAlive()) db.ref('rooms/' + roomCode + '/minigameData/targets/' + key).remove(); }, 1500);
+  miniTargetTimers.push(tmr);
+}
+function minisDataAlive(){ return roomRef && roomState && roomState.status === 'minigame'; }
+
+/* ---------- 🧠 HIZLI BİLGİ ---------- */
+function launchTrivia(ids, count){
+  const shuffled = shuffleSample(TRIVIA_BANK, count);
+  // doğrular host yerelinde kalır (Firebase'den okunamaz → hile yok)
+  triviaQuestions = shuffled.map(item => {
+    const opts = shuffleSample(item.options, item.options.length);
+    return { q: item.q, options: opts, correct: item.correct };
+  });
+  roomRef.child('miniGameState').update({ phase:'question', qIndex:0, totalQuestions: triviaQuestions.length, scores:zeroScores(ids) });
+  triviaAsk(0);
+}
+function triviaAsk(qIndex){
+  if(!roomRef || !isHost) return;
+  const q = triviaQuestions[qIndex];
+  if(!q){ roomRef.child('miniGameState').update({ phase:'gameend' }); return; }
+  roomRef.child('miniGameState').update({
+    phase:'question', qIndex, currentQuestion: { q:q.q, options:q.options, questionEnd: Date.now() + 13000, index:qIndex }, results:null, reveal:null
+  });
+  db.ref('rooms/' + roomCode + '/minigameData/triviaAnswers/' + qIndex).remove();
+  miniEvalTimer = setTimeout(() => triviaEvaluate(qIndex), 13200);
+}
+function triviaEvaluate(qIndex){
+  if(!roomRef || !isHost) return;
+  const q = triviaQuestions[qIndex];
+  db.ref('rooms/' + roomCode + '/minigameData/triviaAnswers/' + qIndex).get().then(snap => {
+    const ans = snap.val() || {};
+    const correctIdx = q.options.findIndex(o => o === q.correct);
+    const correctPlayers = [];
+    const wrongPlayers = [];
+    Object.keys(ans).forEach(pid => {
+      const a = ans[pid];
+      if(q.options[a.option] === q.correct){ correctPlayers.push({ pid, t: a.t }); }
+      else { wrongPlayers.push(pid); }
+    });
+    correctPlayers.sort((a,b) => a.t - b.t);
+    const scores = currentMiniScores();
+    const pts = [100, 70, 50, 30];
+    const results = {};
+    correctPlayers.forEach((cp, i) => {
+      const p = pts[i] !== undefined ? pts[i] : 30;
+      scores[cp.pid] = (scores[cp.pid]||0) + p;
+      results[cp.pid] = { correct:true, points:p };
+    });
+    wrongPlayers.forEach(pid => { results[pid] = { correct:false, points:0 }; });
+    roomRef.child('miniGameState').update({ phase:'reveal', results, reveal:{ correctIndex:correctIdx, scores, qIndex:qIndex } });
+    miniEvalTimer = setTimeout(() => {
+      if(qIndex + 1 >= triviaQuestions.length){ roomRef.child('miniGameState').update({ phase:'gameend' }); }
+      else { triviaAsk(qIndex + 1); }
+    }, 3600);
+  });
+}
+
+/* ---------- 🔗 KELİME ZİNCİRİ ---------- */
+const CHAIN_SEEDS = ["ayar","bal","çocuk","deniz","ev","fare","gül","havuç","ışık","kalem","limon","mavi","nar","otobüs","para","radyo","saat","tahta","uydu","vapur","yıl","zaman","demir","köpek","yıldız","beyaz"];
+let chainAccepted = false;
+let chainTurnCount = 0;
+function launchWordchain(ids){
+  const order = shuffleSample(ids, ids.length);
+  const seed = CHAIN_SEEDS[Math.floor(Math.random()*CHAIN_SEEDS.length)];
+  const startLetter = seed.slice(-1).toLocaleLowerCase('tr-TR');
+  const alive = {}; order.forEach(id => alive[id] = true);
+  roomRef.child('miniGameState').set({
+    type:'chain', phase:'playing', order, currentIdx:0, alive,
+    usedWords:[normalize(seed)], chain:[{ word:seed, by:'seed' }],
+    lastWord:seed, currentLetter:startLetter, turnEnd: Date.now() + 8000,
+    turnCount:0, currentId: order[0], scores: zeroScores(ids), winner:null
+  });
+  chainAccepted = false; chainTurnCount = 0;
+  chainListenAndSchedule(0);
+}
+function nextAliveIdx(order, alive, fromIdx){
+  for(let k=1;k<=order.length;k++){
+    const idx = (fromIdx + k) % order.length;
+    if(alive[order[idx]]) return idx;
+  }
+  return null;
+}
+function chainListenAndSchedule(turnCount){
+  const ref = db.ref('rooms/' + roomCode + '/minigameData/wordchainWords/' + turnCount);
+  const handler = (snap) => {
+    const w = snap.val(); if(!w || !isHost || !roomRef) return;
+    chainHandleWord(w, turnCount);
+  };
+  ref.on('child_added', handler);
+  miniUnsubs.push(() => ref.off('child_added', handler));
+  miniEvalTimer = setTimeout(() => chainTimeout(turnCount), 8050);
+}
+function chainHandleWord(w, turnCount){
+  if(!roomRef || !isHost || chainAccepted) return;
+  const st = roomState.miniGameState; if(!st) return;
+  const word = normalize(w.word);
+  // sadece sıradaki oyuncu göndermiş olmalı
+  if(w.uid !== st.currentId) return;
+  // harf kontrolü
+  if(!word || word.length < 2){ chainReject(w); return; }
+  const first = word.charAt(0).toLocaleLowerCase('tr-TR');
+  if(first !== st.currentLetter){ chainReject(w, 'Yanlış harfle başlıyor!'); return; }
+  if((st.usedWords||[]).includes(word)){ chainReject(w, 'Bu kelime zaten söylendi!'); return; }
+  // geçerli
+  chainAccepted = true;
+  const lastLetter = word.slice(-1).toLocaleLowerCase('tr-TR');
+  const scores = currentMiniScores();
+  scores[st.currentId] = (scores[st.currentId]||0) + 10; // doğru kelime puanı
+  const newChain = [...(st.chain||[]), { word: w.word, by: st.currentId }];
+  const newUsed = [...(st.usedWords||[]), word];
+  const nextIdx = nextAliveIdx(st.order, st.alive, st.currentIdx);
+  if(nextIdx === null || aliveCount(st.alive) <= 1){
+    // oyun bitti
+    roomRef.child('miniGameState').update({ phase:'gameend', winner: st.currentId, scores,
+      usedWords:newUsed, chain:newChain, lastWord: w.word, currentLetter:lastLetter, currentId:null });
+    return;
+  }
+  chainTurnCount += 1;
+  roomRef.child('miniGameState').update({
+    chain:newChain, usedWords:newUsed, lastWord: w.word, currentLetter:lastLetter,
+    currentIdx: nextIdx, currentId: st.order[nextIdx], turnEnd: Date.now()+8000, turnCount: chainTurnCount, scores
+  });
+  chainAccepted = false;
+  setTimeout(() => chainListenAndSchedule(chainTurnCount), 60);
+}
+function chainTimeout(turnCount){
+  if(!roomRef || !isHost || chainAccepted) return;
+  const st = roomState.miniGameState; if(!st) return;
+  // süre doldu, mevcut oyuncuyu ele
+  const alive = { ...st.alive }; alive[st.currentId] = false;
+  if(aliveCount(alive) <= 1){
+    const winnerId = Object.keys(alive).find(id => alive[id]);
+    roomRef.child('miniGameState').update({ phase:'gameend', alive, winner: winnerId });
+    return;
+  }
+  const nextIdx = nextAliveIdx(st.order, alive, st.currentIdx);
+  roomRef.child('miniGameState').update({ alive, currentIdx: nextIdx, currentId: st.order[nextIdx], turnEnd: Date.now()+8000, turnCount: chainTurnCount+1 });
+  chainTurnCount += 1;
+  chainAccepted = false;
+  // mevcut oyuncu pas geçince kelime letter aynı kalır
+  db.ref('rooms/' + roomCode + '/minigameData/wordchainWords/' + turnCount).remove();
+  setTimeout(() => chainListenAndSchedule(chainTurnCount), 60);
+}
+function chainReject(w, reason){
+  // geçersiz kelime: push'u sil ve dokunuşu yok say (oyuncu tekrar deneyebilir)
+  toast(reason ? reason : 'Geçersiz kelime!');
+  playSound('wrong');
+}
+function aliveCount(alive){ return Object.values(alive||{}).filter(Boolean).length; }
+
+/* ---------- host: faz motoru ---------- */
+function hostMiniGameLogic(data){
+  const st = data.miniGameState;
+  if(!st) return;
+  if(st.type === 'target'){
+    // oyun bir kez başlatıldıktan sonra interval ayakta; ancak host değiştiyse ve faz playing ise yenilenebilir
+    if(st.phase === 'playing' && !miniSpawnTimer && Date.now() < (st.endTime||0)){
+      miniEntityResumeTarget();
+    }
+    if(st.phase === 'playing' && (st.endTime && Date.now() >= st.endTime)){
+      if(miniSpawnTimer){ clearInterval(miniSpawnTimer); miniSpawnTimer = null; }
+      roomRef.child('miniGameState').update({ phase:'gameend' });
+    }
+  }
+  // reflex/trivia/chain host zamanlayıcıları zaten ayakta (evalTimer).
+  // Yeni host devralırsa oyun güvenli şekilde lobiye döner:
+  if(isHost && data.hostId === myId && st.type !== 'target'){
+    if(data._hostSwitchedFromReflex){ /* placeholder */ }
+  }
+}
+function miniEntityResumeTarget(){
+  // tekrar spawn döngüsü (host değişirse)
+  miniSpawnTimer = setInterval(() => {
+    if(!roomRef || !isHost || Date.now() > (roomState.miniGameState?.endTime||0)){
+      if(miniSpawnTimer){ clearInterval(miniSpawnTimer); miniSpawnTimer = null; }
+      return;
+    }
+    spawnTarget();
+  }, 620);
+}
+
+function currentMiniScores(){
+  return JSON.parse(JSON.stringify((roomState.miniGameState && roomState.miniGameState.scores) || {}));
+}
+function zeroScores(ids){ const o={}; ids.forEach(id=>o[id]=0); return o; }
+
+/* ---------- render: mini oyun ekranı ---------- */
+function renderMiniGame(data, players){
+  const st = data.miniGameState;
+  if(!st){ document.getElementById('mini-arena').innerHTML = '<p class="lobby-note">Hazırlanıyor…</p>'; return; }
+  const meta = document.getElementById('mini-meta');
+  const title = document.getElementById('mini-title');
+  const game = MINI_GAMES.find(m => m.id === st.type);
+  title.textContent = (game? game.emoji + ' ' : '') + (game? game.name : 'Mini Oyun');
+  // standings
+  renderMiniStandings(st.scores || {}, players, st);
+
+  if(st.type === 'reflex'){ meta.textContent = `Tur ${st.round||0}/${st.totalRounds||0}`; renderReflex(st, players); }
+  else if(st.type === 'target'){ renderTarget(st, players); meta.textContent = st.phase==='gameend' ? 'Bitti' : '60 sn'; }
+  else if(st.type === 'trivia'){ renderTrivia(st, players); meta.textContent = `Soru ${(st.qIndex||0)+1}/${st.totalQuestions||st.totalRounds||0}`; }
+  else if(st.type === 'chain'){ renderWordchain(st, players); meta.textContent = aliveCount(st.alive) + ' oyuncu ayakta'; }
+}
+
+function renderMiniStandings(scores, players, st){
+  const wrap = document.getElementById('mini-standings');
+  wrap.innerHTML = '';
+  const order = st.type === 'chain' ? (st.order||[]) : Object.keys(players).filter(id => players[id].connected !== false);
+  let entries = order.map(id => ({ id, p: players[id], score: scores[id]||0 }));
+  entries.sort((a,b) => b.score - a.score);
+  if(st.type === 'chain'){
+    // ayakta/bağlı kalanlar önce
+    entries.sort((a,b) => {
+      const aa = st.alive && st.alive[a.id] !== false ? 1 : 0;
+      const bb = st.alive && st.alive[b.id] !== false ? 1 : 0;
+      if(aa !== bb) return bb - aa;
+      return b.score - a.score;
+    });
+  }
+  entries.forEach(e => {
+    if(!e.p) return;
+    const chip = document.createElement('div');
+    chip.className = 'score-chip' + (e.id===myId ? ' me' : '');
+    if(st.type === 'chain' && st.alive && st.alive[e.id] === false){ chip.style.opacity = '.45'; chip.style.textDecoration = 'line-through'; }
+    chip.innerHTML = `<span class="dot" style="background:${e.p.color}"></span>${escapeHtml(e.p.name)} · ${e.score}`;
+    wrap.appendChild(chip);
+  });
+}
+
+/* ---- Refleks render ---- */
+function renderReflex(st, players){
+  reflexBeforeRender(st);
+  if(!miniListenersOn){ attachReflexListeners(); miniListenersOn = true; }
+  const arena = document.getElementById('mini-arena');
+  arena.innerHTML = '';
+  const pad = document.createElement('div');
+  pad.className = 'reflex-pad ' + (st.phase==='wait'?'wait':st.phase==='go'?'go':st.phase==='roundend'?'reveal':'idle');
+  if(st.phase === 'wait'){
+    pad.innerHTML = `<div class="rp-big">🔴 Hazırlan… Bekle!</div><div class="rp-sub">Yeşili görünce EN HIZLI basan puan alır. Erken basarsan elenirsin (o tur).</div>`;
+  } else if(st.phase === 'go'){
+    if(reflexGoSeenAt == null) { reflexGoSeenAt = Date.now(); playSound('go'); }
+    pad.innerHTML = `<div class="rp-big">🟢 ŞİMDİ — BAS!</div><div class="rp-sub">Parmağını/kursörü buraya getirip tıkla</div>`;
+  } else if(st.phase === 'roundend'){
+    const won = st.roundWinner === myId;
+    const my = st.roundResults && st.roundResults[myId];
+    let myText = 'Bu turda basmadın';
+    if(my){ if(my.falseStart) myText = 'Erken bastın — bu tur puan yok 🚫'; else myText = 'Reaksiyon: ' + (my.rt||'-') + ' ms'; }
+    const winnerName = (players[st.roundWinner] && players[st.roundWinner].name) || '—';
+    pad.innerHTML = `<div class="rp-big">${won ? '🏆 Turu sen kazandın!' : 'Tur kazananı: '+escapeHtml(winnerName)}</div><div class="rp-sub">${myText}</div>`;
+  } else if(st.phase === 'gameend'){
+    const sorted = Object.entries(st.scores||{}).sort((a,b)=>b[1]-a[1]);
+    pad.innerHTML = `<div class="rp-big">🏁 Düello Bitti</div>`;
+    renderMiniEndCard(arena, sorted, players, '⚡ Refleks Düellosu');
+    return;
+  } else {
+    pad.innerHTML = `<div class="rp-big">⏳ Hazırlanıyor…</div>`;
+  }
+  const onTap = (e) => { e.preventDefault(); reflexTap(st); };
+  pad.addEventListener('mousedown', onTap);
+  pad.addEventListener('touchstart', onTap, {passive:false});
+  arena.appendChild(pad);
+
+  const line = document.createElement('div'); line.className = 'reflex-myline';
+  line.textContent = reflexMyLine || '';
+  arena.appendChild(line);
+}
+function attachReflexListeners(){ /* faz değişimlerini render gördüğü için ek dinleyiciye gerek yok */ }
+function reflexTap(st){
+  if(reflexHasTapped) return;
+  if(st.phase === 'wait'){
+    reflexHasTapped = true;
+    reflexMyLine = '⚠️ Erken bastın — bu tur diskalifiye!';
+    db.ref('rooms/' + roomCode + '/minigameData/taps/' + st.round + '/' + myId).set({ uid:myId, falseStart:true, t:Date.now() });
+    toast('Erken bastın — bu tur puan yok!'); playSound('wrong');
+  } else if(st.phase === 'go'){
+    reflexHasTapped = true;
+    const rt = reflexGoSeenAt == null ? 0 : (Date.now() - reflexGoSeenAt);
+    reflexMyLine = 'Reaksiyon: ' + rt + ' ms';
+    db.ref('rooms/' + roomCode + '/minigameData/taps/' + st.round + '/' + myId).set({ uid:myId, falseStart:false, reactTime: rt, t:Date.now() });
+    playSound('hit');
+  }
+  // ekranda anlık geri besleme
+  const pad = document.querySelector('.reflex-pad');
+  if(pad && reflexHasTapped && st.phase !== 'roundend'){ pad.classList.add('dq'); }
+}
+// her render'da tur değişiminde yerel bayrakları sıfırla
+let lastReflexRoundSeen = -1;
+function resetReflexRoundIfNeeded(st){
+  if((st.round||0) !== lastReflexRoundSeen){ lastReflexRoundSeen = st.round||0; reflexHasTapped = false; reflexMyLine = null; }
+  if(st.phase !== 'go'){ /* go yalnızca bir kez tetiklensin */ }
+}
+// renderReflex'ten önce sıfırlama:
+function _noop(){ /* yer tutucu */ }
+
+// Render öncesi tur sıfırlama — renderReflex içinde çağrılır
+function reflexBeforeRender(st){ resetReflexRoundIfNeeded(st); if(st.phase !== 'go'){ reflexGoSeenAt = null; } }
+
+/* ---- Hedef Avı render ---- */
+let targetSeenIds = new Set();
+function renderTarget(st, players){
+  const arena = document.getElementById('mini-arena');
+  arena.innerHTML = '';
+  if(st.phase === 'gameend'){
+    const sorted = Object.entries(st.scores||{}).sort((a,b)=>b[1]-a[1]);
+    const wrap = document.createElement('div');
+    wrap.style.width='100%';
+    arena.appendChild(wrap);
+    renderMiniEndCard(arena, sorted, players, '🎯 Hedef Avı');
+    return;
+  }
+  const field = document.createElement('div');
+  field.className = 'target-field';
+  arena.appendChild(field);
+  // canlı sayaç
+  const counter = document.createElement('div');
+  counter.style.textAlign='center'; counter.style.fontSize='13px'; counter.style.fontWeight='700'; counter.style.color='var(--ink-soft)'; counter.style.marginTop='8px';
+  counter.id='target-counter';
+  arena.appendChild(counter);
+  updateTargetCounter(st);
+
+  // sadece once attach dinleyiciler
+  if(!miniListenersOn){
+    attachTargetListeners(field);
+    miniListenersOn = true;
+    targetSeenIds = new Set();
+  } else {
+    // alan yeniden yaratıldıysa eski dot'lar context'i kaybeder — yeniden dinleyici bağla
+    attachTargetListeners(field);
+  }
+  // var olan hedefleri senkronize et (ilk render)
+  syncTargetsFromDB(field);
+}
+function attachTargetListeners(field){
+  // target child_added ve child_removed
+  const targetsRef = db.ref('rooms/' + roomCode + '/minigameData/targets');
+  // tema: önceden ekli listener'lar varsa temizle
+  miniUnsubs.forEach(fn=>{try{fn();}catch(e){}}); miniUnsubs = [];
+  const added = (snap) => {
+    const t = snap.val(); if(!t) return;
+    if(targetSeenIds.has(snap.key)) return;
+    targetSeenIds.add(snap.key);
+    if(!field.isConnected) return;
+    const dot = document.createElement('div');
+    dot.className = 'target-dot'; dot.dataset.id = snap.key;
+    dot.style.left = t.x + '%'; dot.style.top = t.y + '%';
+    dot.textContent = '🎯';
+    const onHit = (e) => { e.preventDefault(); e.stopPropagation(); claimTarget(snap.key, dot); };
+    dot.addEventListener('mousedown', onHit);
+    dot.addEventListener('touchstart', onHit, {passive:false});
+    field.appendChild(dot);
+  };
+  const removed = (snap) => {
+    targetSeenIds.delete(snap.key);
+    const dot = field.querySelector('.target-dot[data-id="'+snap.key+'"]');
+    if(dot) dot.remove();
+  };
+  targetsRef.on('child_added', added);
+  targetsRef.on('child_removed', removed);
+  miniUnsubs.push(() => { targetsRef.off('child_added', added); targetsRef.off('child_removed', removed); });
+}
+function syncTargetsFromDB(field){
+  db.ref('rooms/' + roomCode + '/minigameData/targets').get().then(snap => {
+    const items = snap.val() || {};
+    Object.keys(items).forEach(key => {
+      const t = items[key];
+      if(targetSeenIds.has(key)) return;
+      if(t.claimedBy) { targetSeenIds.add(key); return; }
+      if(!field.isConnected) return;
+      targetSeenIds.add(key);
+      const dot = document.createElement('div');
+      dot.className = 'target-dot'; dot.dataset.id = key;
+      dot.style.left = t.x + '%'; dot.style.top = t.y + '%'; dot.textContent = '🎯';
+      const onHit = (e) => { e.preventDefault(); e.stopPropagation(); claimTarget(key, dot); };
+      dot.addEventListener('mousedown', onHit);
+      dot.addEventListener('touchstart', onHit, {passive:false});
+      field.appendChild(dot);
+    });
+  });
+}
+function claimTarget(key, dot){
+  if(dot.dataset.claimed === '1') return;
+  const targetRef = db.ref('rooms/' + roomCode + '/minigameData/targets/' + key + '/claimedBy');
+  targetRef.transaction(cur => {
+    if(cur === null || cur === undefined) return myId; // kazandık
+    return cur; // zaten alınmış
+  }).then(res => {
+    if(res.committed && res.snapshot.val() === myId){
+      dot.dataset.claimed = '1'; dot.classList.add('claimed');
+      playSound('hit');
+      // kendi puanını artır (transaction güvenli)
+      roomRef.child('miniGameState/scores/' + myId).transaction(cur => (cur||0) + 1);
+      // hedefi kısa süre sonra kaldır
+      setTimeout(() => db.ref('rooms/' + roomCode + '/minigameData/targets/' + key).remove(), 280);
+    } else {
+      dot.classList.add('claimed'); setTimeout(()=>dot.remove(), 320); // bir başkası aldı
+    }
+  });
+}
+function updateTargetCounter(st){
+  const c = document.getElementById('target-counter');
+  if(!c) return;
+  const remaining = st.endTime ? Math.max(0, Math.ceil((st.endTime - Date.now())/1000)) : 0;
+  const myScore = (st.scores && st.scores[myId]) || 0;
+  const lead = Object.entries(st.scores||{}).sort((a,b)=>b[1]-a[1])[0];
+  const leadName = lead ? (roomState.players?.[lead[0]]?.name) : '—';
+  c.textContent = `⏱️ ${remaining}s · Sen: ${myScore} · Lider: ${lead ? lead[1] : 0} (${leadName})`;
+  if(st.phase === 'playing'){ requestAnimationFrame(()=>updateTargetCounter(st)); }
+}
+
+/* ---- Hızlı Bilgi render ---- */
+function renderTrivia(st, players){
+  const arena = document.getElementById('mini-arena');
+  arena.innerHTML = '';
+  if(st.phase === 'gameend'){
+    const sorted = Object.entries(st.scores||{}).sort((a,b)=>b[1]-a[1]);
+    renderMiniEndCard(arena, sorted, players, '🧠 Hızlı Bilgi');
+    return;
+  }
+  const card = document.createElement('div');
+  card.className = 'mini-card-inner';
+  if(st.phase === 'question' && st.currentQuestion){
+    const cq = st.currentQuestion;
+    if((st.qIndex||0) !== lastReflexRoundSeen) { triviaMyAnswer = null; lastReflexRoundSeen = st.qIndex||0; }
+    const remaining = cq.questionEnd ? Math.max(0, Math.ceil((cq.questionEnd - Date.now())/1000)) : 0;
+    const head = document.createElement('div');
+    head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center'; head.style.marginBottom='6px';
+    head.innerHTML = `<span style="font-weight:700; color:var(--ink-soft); font-size:13px;">Soru ${cq.index+1}/${triviaQuestions.length||st.totalQuestions||0}</span><span style="font-weight:700; color:var(--coral);">⏱️ ${remaining}s</span>`;
+    card.appendChild(head);
+
+    const q = document.createElement('div'); q.className = 'trivia-q'; q.textContent = cq.q; card.appendChild(q);
+    const opts = document.createElement('div'); opts.className = 'trivia-opts';
+    const keys = ['A','B','C','D'];
+    cq.options.forEach((opt, idx) => {
+      const b = document.createElement('button');
+      b.className = 'trivia-opt' + (triviaMyAnswer === idx ? ' picked' : '');
+      b.innerHTML = `<span class="to-key">${keys[idx]||idx+1}</span><span>${escapeHtml(opt)}</span>`;
+      const answered = triviaMyAnswer != null;
+      b.disabled = answered;
+      b.onclick = () => { if(triviaMyAnswer != null) return; triviaMyAnswer = idx; db.ref('rooms/' + roomCode + '/minigameData/triviaAnswers/' + cq.index + '/' + myId).set({ option:idx, t:Date.now() }); playSound('tick'); b.classList.add('picked'); opts.querySelectorAll('.trivia-opt').forEach(x=>x.disabled=true); const stt = document.getElementById('trivia-status'); if(stt) stt.textContent = 'Cevabın gönderildi, diğerleri bekleniyor…'; };
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+
+    const status = document.createElement('div'); status.id='trivia-status'; status.className='trivia-status';
+    status.textContent = triviaMyAnswer != null ? 'Cevabın gönderildi, diğerleri bekleniyor…' : (remaining>0 ? 'En hızlı doğru cevap en çok puan kazanır!' : 'Süre doldu!');
+    card.appendChild(status);
+
+    // kalan süre çubuğu
+    const barWrap = document.createElement('div'); barWrap.style.height='8px'; barWrap.style.borderRadius='999px'; barWrap.style.background='#EEEEF0'; barWrap.style.marginTop='10px'; barWrap.style.overflow='hidden';
+    const bar = document.createElement('div'); bar.style.height='100%'; bar.style.background='var(--brand)'; bar.style.borderRadius='999px';
+    barWrap.appendChild(bar); card.appendChild(barWrap);
+    const tickBar = () => {
+      if(!bar.isConnected) return;
+      const rem = cq.questionEnd ? Math.max(0, cq.questionEnd - Date.now()) : 0;
+      const pct = Math.max(0, Math.min(100, (rem/13000)*100));
+      bar.style.width = pct + '%';
+      bar.style.background = pct < 25 ? 'var(--danger)' : (pct < 55 ? 'var(--mustard)' : 'var(--brand)');
+      if(rem > 0) requestAnimationFrame(tickBar);
+    };
+    tickBar();
+  } else if(st.phase === 'reveal' && st.reveal){
+    const r = st.reveal;
+    const cq = st.currentQuestion;
+    // reveal sırasında soruyu tekrar gösterelim
+    const prev = triviaQuestions[r.qIndex] || (cq && { q:cq.q, options:cq.options, correct:null });
+    if(prev){
+      const q = document.createElement('div'); q.className='trivia-q'; q.textContent = prev.q; card.appendChild(q);
+      const opts = document.createElement('div'); opts.className='trivia-opts';
+      const keys = ['A','B','C','D'];
+      prev.options.forEach((opt, idx) => {
+        const b = document.createElement('button'); b.className = 'trivia-opt'; b.disabled = true;
+        if(idx === r.correctIndex) b.classList.add('correct');
+        else if(triviaMyAnswer === idx) b.classList.add('wrong');
+        b.innerHTML = `<span class="to-key">${keys[idx]||idx+1}</span><span>${escapeHtml(opt)}</span>`;
+        opts.appendChild(b);
+      });
+      card.appendChild(opts);
+    }
+    const my = st.results && st.results[myId];
+    const line = document.createElement('div'); line.className='trivia-status';
+    line.textContent = my ? (my.correct ? '✅ Doğru! +' + my.points + ' puan' : '❌ Yanlış (+0)') : 'Cevap vermedin';
+    line.style.fontWeight='700'; line.style.fontSize='15px';
+    card.appendChild(line);
+    if(my){ my.correct ? playSound('correct') : playSound('wrong'); }
+  }
+  arena.appendChild(card);
+  if(st.phase === 'question'){ /* bekle */ }
+}
+
+/* ---- Kelime Zinciri render ---- */
+function renderWordchain(st, players){
+  const arena = document.getElementById('mini-arena');
+  arena.innerHTML = '';
+  if(st.phase === 'gameend'){
+    const winnerId = st.winner;
+    const winnerName = (players[winnerId] && players[winnerId].name) || '—';
+    const sorted = Object.entries(st.scores||{}).sort((a,b)=>b[1]-a[1]);
+    arena.innerHTML = `<div class="mini-card-inner" style="text-align:center;"><div style="font-family:'Fredoka'; font-size:24px;">🏆 Kazanan: ${escapeHtml(winnerName)}</div><div style="color:var(--ink-soft); margin:6px 0 14px;">Son ayakta kalan!</div></div>`;
+    renderMiniEndCard(arena, sorted, players, '🔗 Kelime Zinciri');
+    return;
+  }
+  const card = document.createElement('div'); card.className = 'mini-card-inner'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='12px';
+  // zincir listesi
+  const listWrap = document.createElement('div');
+  listWrap.innerHTML = `<div style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin-bottom:4px;">📋 Zincir</div>`;
+  const list = document.createElement('div'); list.className='chain-list';
+  (st.chain||[]).forEach(c => {
+    const w = document.createElement('span'); w.className = 'chain-word' + (c.by==='seed'?' seed':'');
+    w.textContent = c.by === 'seed' ? '🌱 ' + c.word : c.word;
+    list.appendChild(w);
+  });
+  listWrap.appendChild(list); card.appendChild(listWrap);
+
+  // mektup rozeti
+  const badge = document.createElement('div'); badge.className='chainletter-badge';
+  badge.innerHTML = `Bu kelime <span class="clb-letter">${escapeHtml((st.currentLetter||'').toUpperCase())}</span> harfiyle başlamalı`;
+  card.appendChild(badge);
+
+  // sıradaki oyuncu
+  const turnCard = document.createElement('div'); turnCard.className='turn-card';
+  const curP = players[st.currentId];
+  const isMe = st.currentId === myId;
+  const remaining = st.turnEnd ? Math.max(0, Math.ceil((st.turnEnd - Date.now())/1000)) : 0;
+  turnCard.innerHTML = `<div class="turn-player"><span class="dot" style="background:${curP?curP.color:'#ccc'}"></span>${isMe?'Sen sıradasın!':escapeHtml(curP?curP.name:'…') + ' düşünüyor…'}</div>`;
+  const barWrap = document.createElement('div'); barWrap.className='turn-bar';
+  const bar = document.createElement('div'); barWrap.appendChild(bar); turnCard.appendChild(barWrap);
+  if(isMe){
+    const row = document.createElement('div'); row.className='chain-input-row';
+    const inp = document.createElement('input'); inp.className='field'; inp.maxLength=24; inp.placeholder=(st.currentLetter||'a').toUpperCase() + '… ile başlayan bir kelime yaz';
+    const sendBtn = document.createElement('button'); sendBtn.className='btn btn-coral'; sendBtn.textContent='Gönder';
+    const submit = () => {
+      const v = inp.value.trim(); if(!v) return;
+      const first = v.charAt(0).toLocaleLowerCase('tr-TR');
+      if(first !== st.currentLetter){ toast((st.currentLetter||'').toUpperCase() + ' harfiyle başlamalı!'); playSound('wrong'); return; }
+      if((st.usedWords||[]).includes(normalize(v))){ toast('Bu kelime zaten söylendi!'); playSound('wrong'); return; }
+      db.ref('rooms/' + roomCode + '/minigameData/wordchainWords/' + (st.turnCount||0) + '/' + myId).set({ word:v, uid:myId, t:Date.now() });
+      playSound('tick'); inp.value='';
+    };
+    sendBtn.onclick = submit; inp.addEventListener('keydown', e => { if(e.key==='Enter') submit(); });
+    row.appendChild(inp); row.appendChild(sendBtn); turnCard.appendChild(row);
+    setTimeout(()=>inp.focus(), 30);
+  } else {
+    const waitLine = document.createElement('div'); waitLine.className='lobby-note'; waitLine.textContent = 'Sıra sende değil, bekle…'; turnCard.appendChild(waitLine);
+  }
+  card.appendChild(turnCard);
+
+  // ayakta kalanlar
+  const pips = document.createElement('div'); pips.className='alive-pips';
+  (st.order||[]).forEach(id => {
+    const p = players[id]; if(!p) return;
+    const pip = document.createElement('div'); pip.className = 'alive-pip' + (id===myId?' me':'') + (st.alive && st.alive[id]===false?' dead':'');
+    pip.innerHTML = `<span class="dot" style="background:${p.color}"></span>${escapeHtml(p.name)}`;
+    pips.appendChild(pip);
+  });
+  card.appendChild(pips);
+
+  arena.appendChild(card);
+
+  // zamanlayıcı çubuğu animasyonu
+  const tickTurn = () => {
+    if(!bar.isConnected) return;
+    const rem = st.turnEnd ? Math.max(0, st.turnEnd - Date.now()) : 0;
+    const pct = Math.max(0, Math.min(100, (rem/8000)*100));
+    bar.style.width = pct + '%';
+    bar.style.background = pct < 30 ? 'var(--danger)' : (pct < 60 ? 'var(--mustard)' : 'var(--coral)');
+    if(rem > 0 && st.phase === 'playing') requestAnimationFrame(tickTurn);
+  };
+  tickTurn();
+}
+
+/* ---- Mini oyun sonu kartı (ortak) ---- */
+function renderMiniEndCard(arena, sorted, players, label){
+  const wrap = document.createElement('div'); wrap.className='mini-end';
+  const h = document.createElement('h2'); h.textContent='🏁 ' + label + ' Bitti!'; h.style.margin='0';
+  wrap.appendChild(h);
+  const score = document.createElement('div'); score.className='scoreboard';
+  const medals = ['🥇','🥈','🥉'];
+  sorted.forEach(([id,pts], i) => {
+    const p = players[id]; if(!p) return;
+    const row = document.createElement('div'); row.className = 'row' + (i===0? ' top1':'');
+    row.innerHTML = `<span class="medal">${medals[i]||'•'}</span><span class="dot" style="background:${p.color}"></span><span class="sname">${escapeHtml(p.name)}${id===myId?' (sen)':''}</span><span class="spts">${pts||0}</span>`;
+    score.appendChild(row);
+  });
+  wrap.appendChild(score);
+  const actions = document.createElement('div'); actions.className='mini-ended-actions';
+  const again = document.createElement('button'); again.className='btn btn-primary'; again.textContent='🔄 Tekrar Oyna';
+  const lobby = document.createElement('button'); lobby.className='btn btn-ghost'; lobby.textContent='🏠 Oda Lobisine Dön';
+  again.onclick = () => { if(isHost) miniPlayAgain(); else toast('Yalnızca oda sahibi yeniden başlatabilir'); };
+  lobby.onclick = () => { if(isHost) miniBackToLobby(); else toast('Yalnızca oda sahibi lobiye dönebilir'); };
+  actions.appendChild(again); actions.appendChild(lobby);
+  wrap.appendChild(actions);
+  arena.appendChild(wrap);
+}
+function miniPlayAgain(){
+  if(!isHost || !roomRef) return;
+  const ids = Object.keys(roomState.players||{}).filter(id => roomState.players[id].connected !== false);
+  cleanupMiniGame();
+  startMiniGame(ids);
+}
+function miniBackToLobby(){
+  if(!isHost || !roomRef) return;
+  cleanupMiniGame();
+  db.ref('rooms/' + roomCode + '/minigameData').remove();
+  roomRef.update({ status:'lobby', miniGameState:null });
+}
+
+/* bir tur/soru değişiminde yerel bayrak sıfırlama (renderReflex/renderTrivia) */
+// renderReflex çağrı öncesi:
+const _origRenderReflex = renderReflex;
+function renderReflexWrapped(st, players){ reflexBeforeRender(st); _origRenderReflex(st, players); }
+// renderReflex'i sarmaladık:
+// NOT: yukarıda tanımlanan renderReflex yerine bu sarmalı kullanmadan, renderMiniGame doğrudan _origRenderReflex çağırsın diye burada çevirmiyoruz.
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"f0f03d0605bf45f1a3b17cf7d5e6861f"}' crossorigin="anonymous"></script>
 </body>
 </html>
- 
